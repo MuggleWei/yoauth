@@ -1,0 +1,42 @@
+name: yoauth
+variables:
+  - build_type: debug
+  - yoauth_tag: v1.0.0
+  - mugglec_tag: v1.3.0
+  - openssl_tag: openssl-3.1.1
+  - unity_tag: v2.5.2
+source:
+  maintainer: mugglewei
+  name: yoauth
+  tag: ${yoauth_tag}
+deps:
+  - maintainer: mugglewei
+    name: mugglec
+    tag: ${mugglec_tag}
+  - maintainer: openssl
+    name: openssl
+    tag: ${openssl_tag}
+test_deps:
+  - maintainer: ThrowTheSwitch
+    name: unity
+    tag: ${unity_tag}
+jobs:
+  build:
+    steps:
+      - name: build
+        run: >
+          cmake \
+            -S ${HPB_SOURCE_PATH} \
+            -B ${HPB_BUILD_DIR} \
+            -DCMAKE_BUILD_TYPE=${build_type} \
+            -DCMAKE_INSTALL_PREFIX=${HPB_OUTPUT_DIR} \
+            -DBUILD_TESTING=OFF \
+            -DCMAKE_PREFIX_PATH="${HPB_DEPS_DIR};${HPB_TEST_DEPS_DIR}";
+          cmake --build ${HPB_BUILD_DIR};
+          cmake --build ${HPB_BUILD_DIR} --target install;
+  package:
+    steps:
+      - name: package
+        run: >
+          cd ${HPB_TASK_DIR};
+          hpb pack --copy-to ${HPB_ROOT_DIR}/dist;

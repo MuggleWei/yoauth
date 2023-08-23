@@ -1,0 +1,38 @@
+name: unity
+variables:
+  - build_type: release
+  - unity_tag: v2.5.2
+  - unity_url: https://github.com/ThrowTheSwitch/Unity.git
+source:
+  maintainer: ThrowTheSwitch
+  name: unity
+  tag: ${unity_tag}
+  repo_kind: git
+  repo_url: ${unity_url}
+  git_depth: 1
+jobs:
+  build:
+    steps:
+      - name: build
+        run: >
+          cd ${HPB_TASK_DIR};
+          cmake \
+            -S ${HPB_SOURCE_PATH} \
+            -B ${HPB_BUILD_DIR} \
+            -DCMAKE_BUILD_TYPE=${build_type} \
+            -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX=${HPB_OUTPUT_DIR};
+          cmake --build ${HPB_BUILD_DIR} --config ${build_type};
+          cmake --build ${HPB_BUILD_DIR} --target install;
+  package:
+    needs: [build]
+    steps:
+      - name: pack
+        run: >
+          hpb pack;
+  upload:
+    needs: [package]
+    steps:
+      - name: upload
+        run: >
+          hpb push;

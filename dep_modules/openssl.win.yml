@@ -1,0 +1,58 @@
+name: openssl
+variables:
+  - build_type: release
+  - openssl_tag: openssl-3.1.1
+  - openssl_url: https://github.com/openssl/openssl.git
+  #- zlib_tag: v1.2.13
+source:
+  maintainer: openssl
+  name: openssl
+  tag: ${openssl_tag}
+  repo_kind: git
+  repo_url: ${openssl_url}
+  git_depth: 1
+#deps:
+#  - name: zlib
+#    maintainer: madler
+#    tag: ${zlib_tag}
+jobs:
+  build:
+    steps:
+      - name: build
+        run: >
+          cd ${HPB_BUILD_DIR};
+          perl ${HPB_SOURCE_PATH}/Configure VC-WIN64A shared \
+            --prefix=${HPB_OUTPUT_DIR} \
+            --openssldir=${HPB_OUTPUT_DIR} \
+            threads \
+            no-comp \
+            no-tests \
+            --${build_type};
+          nmake;
+          nmake install_sw;
+        #run: >
+        #  cd ${HPB_BUILD_DIR};
+        #  perl ${HPB_SOURCE_PATH}/Configure VC-WIN64A shared \
+        #    --prefix=${HPB_OUTPUT_DIR} \
+        #    --openssldir=${HPB_OUTPUT_DIR} \
+        #    threads \
+        #    zlib \
+        #    --with-zlib-include=${HPB_DEPS_DIR}/include \
+        #    --with-zlib-lib=${HPB_DEPS_DIR}/lib/zlib.lib \
+        #    no-tests \
+        #    --${build_type};
+        #  nmake;
+        #  nmake install_sw;
+  package:
+    needs: [build]
+    steps:
+      - name: pack
+        run: >
+          cd ${HPB_TASK_DIR};
+          hpb pack;
+  upload:
+    needs: [package]
+    steps:
+      - name: upload
+        run: >
+          hpb push;
