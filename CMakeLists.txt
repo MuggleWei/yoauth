@@ -142,6 +142,25 @@ set_target_properties(yoauth PROPERTIES
 	VERSION ${YOAUTH_VERSION}
 	SOVERSION ${YOAUTH_VERSION_MAJOR})
 
+# win debug
+if (WIN32)
+	foreach(subdir ${CMAKE_PREFIX_PATH})
+		file(GLOB dll_files "${subdir}/bin/*.dll")
+		foreach(src_file ${dll_files})
+			file(RELATIVE_PATH rel_path ${src_file} ${subdir}/bin)
+			get_filename_component(dst_name ${src_file} NAME)
+			set(dst_file "$(OutDir)${dst_name}")
+			add_custom_command(
+				TARGET yoauth
+				POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different "${src_file}" ${dst_file}
+				DEPENDS "${src_file}"
+				COMMENT "sync ${src_file} to ${dst_file}"
+			)
+		endforeach(src_file ${dll_files})
+	endforeach(subdir ${CMAKE_PREFIX_PATH})
+endif()
+
 ################################
 # install
 ################################
@@ -150,11 +169,21 @@ install(TARGETS yoauth
 	RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 	LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
-install(IMPORTED_RUNTIME_ARTIFACTS mugglec)
-install(FILES
-	"${OPENSSL_CRYPTO_LIBRARY}"
-	DESTINATION ${CMAKE_INSTALL_LIBDIR})
-if (UNIX)
+if (WIN32)
+	foreach(subdir ${CMAKE_PREFIX_PATH})
+		file(GLOB dll_files "${subdir}/bin/*.dll")
+		foreach(src_file ${dll_files})
+			string(REPLACE "\\" "/" src_file "${src_file}")
+			install(FILES
+				"${src_file}"
+				DESTINATION ${CMAKE_INSTALL_BINDIR})
+		endforeach(src_file ${dll_files})
+	endforeach(subdir ${CMAKE_PREFIX_PATH})
+else()
+	install(IMPORTED_RUNTIME_ARTIFACTS mugglec)
+	install(FILES
+		"${OPENSSL_CRYPTO_LIBRARY}"
+		DESTINATION ${CMAKE_INSTALL_LIBDIR})
 	install(FILES
 		"${OPENSSL_CRYPTO_LIBRARY}.3"
 		DESTINATION ${CMAKE_INSTALL_LIBDIR})
