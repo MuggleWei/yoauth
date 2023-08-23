@@ -145,8 +145,20 @@ set_target_properties(yoauth PROPERTIES
 ################################
 # install
 ################################
+include(GNUInstallDirs)
+install(TARGETS yoauth
+	RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 install(IMPORTED_RUNTIME_ARTIFACTS mugglec)
-install(FILES "${OPENSSL_CRYPTO_LIBRARY}" DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(FILES
+	"${OPENSSL_CRYPTO_LIBRARY}"
+	DESTINATION ${CMAKE_INSTALL_LIBDIR})
+if (UNIX)
+	install(FILES
+		"${OPENSSL_CRYPTO_LIBRARY}.3"
+		DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endif()
 
 ################################
 # tests
