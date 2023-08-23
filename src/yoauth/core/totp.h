@@ -5,13 +5,13 @@
  *  @date         2023-08-23
  *  @copyright    Copyright 2023 Muggle Wei
  *  @license      LGPL-3.0
- *  @brief        yoauth TOTP
+ *  @brief        yoauth core TOTP
  *****************************************************************************/
 
-#ifndef YOAUTH_TOTP_H_
-#define YOAUTH_TOTP_H_
+#ifndef YOAUTH_CORE_TOTP_H_
+#define YOAUTH_CORE_TOTP_H_
 
-#include "yoauth/macro.h"
+#include "yoauth/core/macro.h"
 #include <stdint.h>
 #include <time.h>
 

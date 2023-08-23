@@ -23,6 +23,7 @@ doc/compile_commands.json
 ######### build & generated packages #########
 build/
 _hpkg/
+_hpb/
 _deps/
 _package/
 _packages/

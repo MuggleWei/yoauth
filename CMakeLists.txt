@@ -120,13 +120,12 @@ configure_file(
 FILE(GLOB_RECURSE yoauth_gen_h "${yoauth_gen_dir}/yoauth/*.h")
 
 # lib
-FILE(GLOB_RECURSE yoauth_src "${yoauth_src_dir}/yoauth/*.c")
-FILE(GLOB_RECURSE yoauth_h "${yoauth_src_dir}/yoauth/*.h")
-LIST(REMOVE_ITEM yoauth_src "${yoauth_src_dir}/yoauth/main.c")
+FILE(GLOB_RECURSE yoauth_core_src "${yoauth_src_dir}/yoauth/core/*.c")
+FILE(GLOB_RECURSE yoauth_core_h "${yoauth_src_dir}/yoauth/core/*.h")
 set(yoauth_core yoauth_core)
 add_library(${yoauth_core} ${YOAUTH_LIB_TYPE}
-	${yoauth_src}
-	${yoauth_h}
+	${yoauth_core_src}
+	${yoauth_core_h}
 	${yoauth_gen_h})
 target_include_directories(${yoauth_core} PUBLIC
 	$<BUILD_INTERFACE:${yoauth_src_dir}>
@@ -142,6 +141,22 @@ set_target_properties(${yoauth_core} PROPERTIES
 	DEBUG_POSTFIX d
 	VERSION ${YOAUTH_VERSION}
 	SOVERSION ${YOAUTH_VERSION_MAJOR})
+
+if (MSVC OR MINGW)
+	set_target_properties(${yoauth_core}
+		PROPERTIES
+		VS_DEBUGGER_WORKING_DIRECTORY "$(OutDir)")
+else()
+	if (APPLE)
+		set_target_properties(${yoauth_core}
+			PROPERTIES
+			INSTALL_RPATH "@executable_path/../lib")
+	elseif (UNIX)
+		set_target_properties(${yoauth_core}
+			PROPERTIES
+			INSTALL_RPATH "\$ORIGIN/../lib")
+	endif()
+endif()
 
 # win debug
 if (WIN32)
@@ -181,13 +196,21 @@ if (WIN32)
 		endforeach(src_file ${dll_files})
 	endforeach(subdir ${CMAKE_PREFIX_PATH})
 else()
-	install(IMPORTED_RUNTIME_ARTIFACTS mugglec)
-	install(FILES
-		"${OPENSSL_CRYPTO_LIBRARY}"
-		DESTINATION ${CMAKE_INSTALL_LIBDIR})
-	install(FILES
-		"${OPENSSL_CRYPTO_LIBRARY}.3"
-		DESTINATION ${CMAKE_INSTALL_LIBDIR})
+	#install(IMPORTED_RUNTIME_ARTIFACTS mugglec)
+	#install(FILES
+	#    "${OPENSSL_CRYPTO_LIBRARY}"
+	#    "${OPENSSL_CRYPTO_LIBRARY}.3"
+	#    DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+	foreach(subdir ${CMAKE_PREFIX_PATH})
+		file(GLOB shared_files "${subdir}/lib/*.so*")
+		foreach(src_file ${shared_files})
+			string(REPLACE "\\" "/" src_file "${src_file}")
+			install(FILES
+				"${src_file}"
+				DESTINATION ${CMAKE_INSTALL_LIBDIR})
+		endforeach(src_file ${shared_files})
+	endforeach(subdir ${CMAKE_PREFIX_PATH})
 endif()
 
 ################################

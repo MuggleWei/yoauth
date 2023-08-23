@@ -5,11 +5,11 @@
  *  @date         2023-08-23
  *  @copyright    Copyright 2023 Muggle Wei
  *  @license      LGPL-3.0
- *  @brief        yoauth macro
+ *  @brief        yoauth core macro
  *****************************************************************************/
 
-#ifndef YOAUTH_MACRO_H_
-#define YOAUTH_MACRO_H_
+#ifndef YOAUTH_CORE_MACRO_H_
+#define YOAUTH_CORE_MACRO_H_
 
 #include "muggle/c/base/macro.h"
 #include "yoauth/config.h"

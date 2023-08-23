@@ -1,5 +1,5 @@
 #include "unity.h"
-#include "yoauth/totp.h"
+#include "yoauth/core/totp.h"
 #include <string.h>
 
 void setUp()
