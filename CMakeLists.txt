@@ -123,21 +123,22 @@ FILE(GLOB_RECURSE yoauth_gen_h "${yoauth_gen_dir}/yoauth/*.h")
 FILE(GLOB_RECURSE yoauth_src "${yoauth_src_dir}/yoauth/*.c")
 FILE(GLOB_RECURSE yoauth_h "${yoauth_src_dir}/yoauth/*.h")
 LIST(REMOVE_ITEM yoauth_src "${yoauth_src_dir}/yoauth/main.c")
-add_library(yoauth ${YOAUTH_LIB_TYPE}
+set(yoauth_core yoauth_core)
+add_library(${yoauth_core} ${YOAUTH_LIB_TYPE}
 	${yoauth_src}
 	${yoauth_h}
 	${yoauth_gen_h})
-target_include_directories(yoauth PUBLIC
+target_include_directories(${yoauth_core} PUBLIC
 	$<BUILD_INTERFACE:${yoauth_src_dir}>
 	$<BUILD_INTERFACE:${yoauth_gen_dir}>
 	$<INSTALL_INTERFACE:include>)
-target_link_libraries(yoauth mugglec "${OPENSSL_CRYPTO_LIBRARY}")
+target_link_libraries(${yoauth_core} mugglec "${OPENSSL_CRYPTO_LIBRARY}")
 if (UNIX)
-	target_link_libraries(yoauth m)
+	target_link_libraries(${yoauth_core} m)
 endif()
-target_compile_definitions(yoauth
+target_compile_definitions(${yoauth_core}
 	PRIVATE YOAUTH_EXPORTS MUGGLE_HOLD_LOG_MACRO)
-set_target_properties(yoauth PROPERTIES
+set_target_properties(${yoauth_core} PROPERTIES
 	DEBUG_POSTFIX d
 	VERSION ${YOAUTH_VERSION}
 	SOVERSION ${YOAUTH_VERSION_MAJOR})
@@ -151,7 +152,7 @@ if (WIN32)
 			get_filename_component(dst_name ${src_file} NAME)
 			set(dst_file "$(OutDir)${dst_name}")
 			add_custom_command(
-				TARGET yoauth
+				TARGET ${yoauth_core}
 				POST_BUILD
 				COMMAND ${CMAKE_COMMAND} -E copy_if_different "${src_file}" ${dst_file}
 				DEPENDS "${src_file}"
@@ -165,7 +166,7 @@ endif()
 # install
 ################################
 include(GNUInstallDirs)
-install(TARGETS yoauth
+install(TARGETS ${yoauth_core}
 	RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 	LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
@@ -204,8 +205,8 @@ function(add_unittest name folder)
 	else()
 		add_executable(${name} ${tmp_c})
 	endif(MSVC OR MINGW)
-	add_dependencies(${name} yoauth)
-	target_link_libraries(${name} yoauth unity::framework)
+	add_dependencies(${name} ${yoauth_core})
+	target_link_libraries(${name} ${yoauth_core} unity::framework)
 
 	add_test(NAME ${name} COMMAND ${name})
 endfunction()
