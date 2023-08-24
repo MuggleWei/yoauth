@@ -18,32 +18,34 @@ EXTERN_C_BEGIN
 /**
  * @brief encrypt
  *
- * @param plaintext
- * @param plaintext_len
- * @param ciphertext
- * @param p_ciphertext_len
- * @param password
+ * @param plaintext         input plaintext
+ * @param plaintext_len     length of plaintext
+ * @param password          password for encrypt
+ * @param p_ciphertext_len  length of output ciphertext
  *
  * @return 
+ *   - on success, return output ciphertext
+ *   - on failed, return NULL
  */
-bool yoauth_encrypt(unsigned char *plaintext, unsigned long plaintext_len,
-					unsigned char *ciphertext, unsigned long *p_ciphertext_len,
-					const char *password);
+YOAUTH_EXPORT
+unsigned char *yoauth_encrypt(unsigned char *plaintext,
+							  unsigned long plaintext_len, const char *password,
+							  unsigned long *p_ciphertext_len);
 
 /**
  * @brief decrypt
  *
- * @param ciphertext
- * @param ciphertext_len
- * @param plaintext
- * @param p_plaintext_len
- * @param password
+ * @param ciphertext        input ciphertext
+ * @param ciphertext_len    length of ciphertext
+ * @param password          password for decrypt
+ * @param p_plaintext_len   length of output plaintext
  *
  * @return 
  */
-bool yoauth_decrypt(unsigned char *ciphertext, unsigned long ciphertext_len,
-					unsigned char *plaintext, unsigned long *p_plaintext_len,
-					const char *password);
+unsigned char *yoauth_decrypt(unsigned char *ciphertext,
+							  unsigned long ciphertext_len,
+							  const char *password,
+							  unsigned long *p_plaintext_len);
 
 EXTERN_C_END
 
