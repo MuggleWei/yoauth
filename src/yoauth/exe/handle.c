@@ -76,6 +76,7 @@ void yoauth_message_loop()
 	handle.user[strlen(null_user)] = '\0';
 	handle.data_dir = data_dir;
 
+	// message loop
 	char buf[1024];
 	do {
 		YOAUTH_STYLE_TIP;
@@ -103,6 +104,11 @@ void yoauth_message_loop()
 			YOAUTH_ERROR("unrecognized command: %s", command);
 		}
 	} while (true);
+
+	// clean up
+	if (handle.user) {
+		free(handle.user);
+	}
 }
 
 void yoauth_show_usage()
