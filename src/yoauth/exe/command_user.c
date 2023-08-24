@@ -49,13 +49,18 @@ bool yoauth_cmd_user_login(yoauth_handle_t *handle)
 
 	char user_dir[MUGGLE_MAX_PATH];
 	muggle_path_join(handle->data_dir, user, user_dir, sizeof(user_dir));
-
 	if (!muggle_path_exists(user_dir)) {
-		YOAUTH_ERROR("user['%s'] not exists, %s", user, user_dir);
+		YOAUTH_ERROR("user['%s'] not exists", user);
 		return false;
 	}
 
-	// TODO:
+	char totp_filepath[MUGGLE_MAX_PATH];
+	muggle_path_join(user_dir, "totp.data", totp_filepath, sizeof(totp_filepath));
+	if (!muggle_path_exists(totp_filepath)) {
+		YOAUTH_ERROR("user['%s'] totp file not exist", user);
+		return false;
+	}
+
 
 	return true;
 }

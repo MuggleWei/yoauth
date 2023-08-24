@@ -99,6 +99,16 @@ unsigned char *yoauth_encrypt(unsigned char *plaintext,
 	}
 	*p_ciphertext_len += outlen;
 
+	if (ctx) {
+		EVP_CIPHER_CTX_free(ctx);
+	}
+	if (iv) {
+		free(iv);
+	}
+	if (key) {
+		free(key);
+	}
+
 	return ciphertext;
 
 err_encrypt:
@@ -175,6 +185,16 @@ unsigned char *yoauth_decrypt(unsigned char *ciphertext,
 		goto err_decrypt;
 	}
 	*p_plaintext_len += outlen;
+
+	if (ctx) {
+		EVP_CIPHER_CTX_free(ctx);
+	}
+	if (iv) {
+		free(iv);
+	}
+	if (key) {
+		free(key);
+	}
 
 	return plaintext;
 
