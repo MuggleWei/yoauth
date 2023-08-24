@@ -69,7 +69,7 @@ EXTERN_C_BEGIN
 	} while (0);
 
 typedef struct yoauth_handle {
-	const char *user;
+	char *user;
 	const char *data_dir;
 	uint32_t nargs;
 	char *args[32];

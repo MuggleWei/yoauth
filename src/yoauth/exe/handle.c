@@ -62,7 +62,7 @@ bool yoauth_show_welcome_info()
 
 void yoauth_message_loop()
 {
-	static const char *null_user = "<no user login yet>";
+	static const char *null_user = "<no user login>";
 	char data_dir[MUGGLE_MAX_PATH];
 	if (!yoauth_data_dir(data_dir, sizeof(data_dir))) {
 		YOAUTH_ERROR("failed get data dir");
@@ -71,7 +71,9 @@ void yoauth_message_loop()
 
 	yoauth_handle_t handle;
 	memset(&handle, 0, sizeof(handle));
-	handle.user = null_user;
+	handle.user = (char*)malloc(64);
+	strncpy(handle.user, null_user, strlen(null_user));
+	handle.user[strlen(null_user)] = '\0';
 	handle.data_dir = data_dir;
 
 	char buf[1024];

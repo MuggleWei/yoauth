@@ -20,7 +20,7 @@ EXTERN_C_BEGIN
 #define YOAUTH_TOTP_DEFAULT_TIME_STEP 30
 
 typedef struct yoauth_totp {
-	char crypto[16]; //!< crypto function to use
+	char algo[16]; //!< crypto function to use
 	char key[YOAUTH_TOTP_KEY_SIZE]; //!< secret key
 	uint32_t keylen; //!< length of secret key
 	uint32_t return_digits; //!< number of digits to return

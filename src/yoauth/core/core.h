@@ -12,5 +12,7 @@
 
 #include "yoauth/core/macro.h"
 #include "yoauth/core/totp.h"
+#include "yoauth/core/struct.h"
+#include "yoauth/core/data.h"
 
 #endif // !YOAUTH_CORE_CORE_H_
