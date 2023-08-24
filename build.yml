@@ -4,7 +4,6 @@ variables:
   - yoauth_tag: v1.0.0
   - mugglec_tag: v1.3.0
   - openssl_tag: openssl-3.1.1
-  - ncurses_tag: v6.4
   - unity_tag: v2.5.2
 source:
   maintainer: mugglewei
@@ -17,9 +16,6 @@ deps:
   - maintainer: openssl
     name: openssl
     tag: ${openssl_tag}
-  - maintainer: Thomas_E_Dickey
-    name: ncurses
-    tag: ${ncurses_tag}
 test_deps:
   - maintainer: ThrowTheSwitch
     name: unity
