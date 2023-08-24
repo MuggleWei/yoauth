@@ -53,6 +53,7 @@ void test_crypt()
 	// free
 	free(plaintext);
 	free(ciphertext);
+	free(ret_plaintext);
 }
 
 int main()
