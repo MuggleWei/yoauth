@@ -3,7 +3,6 @@
  *  @author       Muggle Wei
  *  @email        mugglewei@gmail.com
  *  @date         2023-08-23
- *  @copyright    Copyright 2023 Muggle Wei
  *  @license      LGPL-3.0
  *  @brief        yoauth core TOTP
  *****************************************************************************/
