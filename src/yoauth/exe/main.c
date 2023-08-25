@@ -1,6 +1,10 @@
 #include "handle.h"
 
-void parse_sys_args(int argc, char **argv)
+typedef struct sys_args {
+	char user[16];
+} sys_args_t;
+
+void parse_sys_args(int argc, char **argv, sys_args_t *args)
 {
 	static struct option long_options[] = {
 		{ "help", no_argument, NULL, 'h' },
@@ -8,6 +12,8 @@ void parse_sys_args(int argc, char **argv)
 		{ "user", required_argument, NULL, 'u' },
 		{ NULL, 0, NULL, 0 }
 	};
+
+	memset(args, 0, sizeof(*args));
 
 	while (true) {
 		int c = 0;
@@ -26,27 +32,33 @@ void parse_sys_args(int argc, char **argv)
 			YOAUTH_OUTPUT("YoAuth version: " YOAUTH_VERSION);
 			exit(EXIT_SUCCESS);
 		} break;
+		case 'u': {
+			int len = strlen(optarg);
+			if (len >= (int)sizeof(args->user) - 1) {
+				YOAUTH_ERROR("length of user beyond the limit(15)");
+				exit(EXIT_FAILURE);
+			}
+			strncpy(args->user, optarg, len);
+			args->user[len] = '\0';
+		} break;
 		default: {
 			YOAUTH_ERROR("unrecognize options");
 			exit(EXIT_FAILURE);
 		} break;
 		}
 	}
+
+	if (args->user[0] == '\0') {
+		strncpy(args->user, "default", sizeof(args->user) - 1);
+	}
 }
 
 int main(int argc, char *argv[])
 {
-	const char *username = "default";
-	if (argc == 1) {
-		yoauth_message_loop(username);
-	} else if (argc == 3) {
-		const char *cmd = argv[1];
-		const char *account = argv[2];
-		if (strcmp(cmd, "add") == 0) {
-		}
-	} else {
-		parse_sys_args(argc, argv);
-	}
+	sys_args_t args;
+	parse_sys_args(argc, argv, &args);
+
+	yoauth_message_loop(args.user);
 
 	return 0;
 }

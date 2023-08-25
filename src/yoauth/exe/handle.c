@@ -1,4 +1,5 @@
 #include "handle.h"
+#include "yoauth/core/totp.h"
 #include "yoauth/exe/tui.h"
 
 static bool yoauth_root_dir(char *buf, size_t bufsize)
@@ -145,23 +146,9 @@ void yoauth_show_usage()
 	YOAUTH_STYLE_NORMAL;
 
 	YOAUTH_OUTPUT_COMMAND_DESC("yoauth", "login");
-	YOAUTH_OUTPUT_COMMAND_DESC(
-		"yoauth add -a <account> -s <base32 key>",
-		"add account");
-	YOAUTH_OUTPUT_COMMAND_DESC("yoauth del -a <account>", "delete account");
-
-	YOAUTH_OUTPUT("");
-	YOAUTH_STYLE_TITLE;
-	YOAUTH_OUTPUT_SPLIT_LINE;
-	YOAUTH_OUTPUT_TITLE("Example");
-	YOAUTH_OUTPUT_SPLIT_LINE;
-	YOAUTH_STYLE_NORMAL;
-
-	YOAUTH_OUTPUT("yoauth")
-	YOAUTH_OUTPUT("  login and show all TOTP code");
-	YOAUTH_OUTPUT("");
-
-	YOAUTH_OUTPUT("yoauth add -a google -s ")
+	YOAUTH_OUTPUT_COMMAND_DESC("yoauth -u <user>", "login with specific user");
+	YOAUTH_OUTPUT_COMMAND_DESC("yoauth --user <user>",
+							   "login with specific user");
 }
 
 bool yoauth_create_user(const char *username)
@@ -251,11 +238,29 @@ bool yoauth_handle_init(yoauth_handle_t *handle, const char *username,
 
 	free(hdr);
 
+	// TODO: testxxx
+	char *test_k = NULL;
+	yoauth_totp_t *test_v = NULL;
+
+	test_k = (char *)malloc(16);
+	memset(test_k, 0, 16);
+	strncpy(test_k, "google", 16 - 1);
+	test_v = yoauth_totp_init("ybmyHDXrESJDjuUN", 16, NULL);
+	muggle_avl_tree_insert(&handle->dict_totp, test_k, test_v);
+
+	test_k = (char *)malloc(16);
+	memset(test_k, 0, 16);
+	strncpy(test_k, "github", 16 - 1);
+	test_v = yoauth_totp_init("Bz77olkHt4Xg4dWN", 16, NULL);
+	muggle_avl_tree_insert(&handle->dict_totp, test_k, test_v);
+
 	return true;
 }
 
 void yoauth_scenes_main(yoauth_handle_t *handle, yoauth_tui_t *tui)
 {
+	MUGGLE_UNUSED(tui);
+
 	// page head
 	YOAUTH_STYLE_TIP;
 	fprintf(stdout, "a: ");
@@ -271,4 +276,31 @@ void yoauth_scenes_main(yoauth_handle_t *handle, yoauth_tui_t *tui)
 	fprintf(stdout, "exit");
 	YOAUTH_OUTPUT("");
 	YOAUTH_OUTPUT_SPLIT_LINE;
+
+	if (handle->dict_totp.root) {
+		time_t ts = time(NULL);
+		yoauth_show_codes(handle->dict_totp.root, ts);
+	}
+
+	// TODO: testxxx
+	getchar();
+}
+
+void yoauth_show_codes(muggle_avl_tree_node_t *node, time_t ts)
+{
+	if (node->left) {
+		yoauth_show_codes(node->left, ts);
+	}
+
+	yoauth_totp_t *totp = node->value;
+	int32_t code = yoauth_totp_at(totp, ts);
+	char *k = (char *)node->key;
+	char v[16];
+	snprintf(v, sizeof(v), "%d", code);
+
+	YOAUTH_OUTPUT_KV(k, v, 20);
+
+	if (node->right) {
+		yoauth_show_codes(node->right, ts);
+	}
 }

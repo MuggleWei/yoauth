@@ -71,6 +71,14 @@ bool yoauth_handle_init(yoauth_handle_t *handle, const char *username,
  */
 void yoauth_scenes_main(yoauth_handle_t *handle, yoauth_tui_t *tui);
 
+/**
+ * @brief show TOTP codes
+ *
+ * @param node  avl tree node
+ * @param ts    timestamp
+ */
+void yoauth_show_codes(muggle_avl_tree_node_t *node, time_t ts);
+
 EXTERN_C_END
 
 #endif // !YOAUTH_EXE_HANDLE_H_

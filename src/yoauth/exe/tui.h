@@ -62,11 +62,12 @@ EXTERN_C_BEGIN
 		int len_k = (int)strlen(k);    \
 		int num_blank = width - len_k; \
 		fprintf(stdout, "  ");         \
-		fprintf(stdout, k);            \
+		fprintf(stdout, "%s", k);      \
 		while (--num_blank > 0) {      \
 			fprintf(stdout, " ");      \
 		}                              \
-		fprintf(stdout, v "\n");       \
+		fprintf(stdout, "%s", v);      \
+		fprintf(stdout, "\n");         \
 	} while (0)
 
 #define YOAUTH_OUTPUT_COMMAND_DESC(k, v) YOAUTH_OUTPUT_KV(k, v, 42)
