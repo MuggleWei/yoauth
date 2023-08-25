@@ -1,5 +1,6 @@
 #include "tui.h"
 #include "scenes.h"
+#include "muggle/c/muggle_c.h"
 
 typedef struct sys_args {
 	char user[16];
@@ -81,6 +82,8 @@ void parse_sys_args(int argc, char **argv, sys_args_t *args)
 
 int main(int argc, char *argv[])
 {
+	muggle_log_complicated_init(-1, LOG_LEVEL_DEBUG, NULL);
+
 	sys_args_t args;
 	parse_sys_args(argc, argv, &args);
 

@@ -12,7 +12,11 @@
 
 #include "yoauth/core/macro.h"
 #include "muggle/c/muggle_c.h"
-#include <termios.h>
+#if MUGGLE_PLATFORM_WINDOWS
+	// TODO:
+#else
+	#include <termios.h>
+#endif
 
 EXTERN_C_BEGIN
 
@@ -94,12 +98,21 @@ EXTERN_C_BEGIN
 #define YOAUTH_ANSI_CLEAN_SCREEN YOAUTH_ANSI_ESC YOAUTH_ANSI_CSI "2J"
 
 typedef struct yoauth_tui {
+#if MUGGLE_PLATFORM_WINDOWS
+	DWORD old_mode;
+	DWORD cur_mode;
+#else
 	struct termios old_term;
 	struct termios cur_term;
+#endif
 } yoauth_tui_t;
 
 void yoauth_tui_setup();
+#if MUGGLE_PLATFORM_WINDOWS
+void yoauth_tui_cleanup(void);
+#else
 void yoauth_tui_cleanup();
+#endif
 void yoauth_tui_cleanup_die(int signo);
 
 void yoauth_tui_move_to(int16_t row, int16_t col);
