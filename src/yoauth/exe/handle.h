@@ -19,37 +19,9 @@ EXTERN_C_BEGIN
 typedef struct yoauth_handle {
 	const char *username;
 	const char *password;
-	muggle_avl_tree_t dict_totp;
+	yoauth_head_t head;
+	muggle_array_list_t *datas;
 } yoauth_handle_t;
-
-/**
- * @brief message loop
- *
- * @param username  user name
- */
-void yoauth_message_loop(const char *username);
-
-/**
- * @brief show Usage information
- */
-void yoauth_show_usage();
-
-/**
- * @brief create new user
- *
- * @param username  user name
- *
- * @return boolean value
- */
-bool yoauth_create_user(const char *username);
-
-/**
- * @brief get user password
- *
- * @param buf      buffer store the password
- * @param bufsize  buffer size
- */
-void yoauth_get_password(char *buf, size_t bufsize);
 
 /**
  * @brief init handle
@@ -64,20 +36,11 @@ bool yoauth_handle_init(yoauth_handle_t *handle, const char *username,
 						const char *password);
 
 /**
- * @brief main scenes
+ * @brief destroy handle
  *
- * @param handle   handle pointer
- * @param tui      tui pointer
+ * @param handle  handle pointer
  */
-void yoauth_scenes_main(yoauth_handle_t *handle, yoauth_tui_t *tui);
-
-/**
- * @brief show TOTP codes
- *
- * @param node  avl tree node
- * @param ts    timestamp
- */
-void yoauth_show_codes(muggle_avl_tree_node_t *node, time_t ts);
+void yoauth_handle_destroy(yoauth_handle_t *handle);
 
 EXTERN_C_END
 

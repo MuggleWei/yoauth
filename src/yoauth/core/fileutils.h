@@ -16,20 +16,6 @@
 EXTERN_C_BEGIN
 
 /**
- * @brief load TOTP file
- *
- * @param filepath  file path of TOTP
- * @param password  user password
- * @param outlen    number of bytes
- *
- * @return plaintext of yoauth_head_t + yoauth_data_totp_t array
- */
-YOAUTH_EXPORT
-unsigned char *yoauth_fileutils_load_totp(const char *filepath,
-										  const char *password,
-										  unsigned long *outlen);
-
-/**
  * @brief store TOTP into file
  *
  * @param filepath   file path
@@ -43,6 +29,20 @@ YOAUTH_EXPORT
 bool yoauth_fileutils_store_totp(const char *filepath, const char *password,
 								 unsigned char *plaintext,
 								 unsigned long numbytes);
+
+/**
+ * @brief load TOTP file
+ *
+ * @param filepath  file path of TOTP
+ * @param password  user password
+ * @param outlen    number of bytes
+ *
+ * @return plaintext of yoauth_head_t + yoauth_data_totp_t array
+ */
+YOAUTH_EXPORT
+unsigned char *yoauth_fileutils_load_totp(const char *filepath,
+										  const char *password,
+										  unsigned long *outlen);
 
 EXTERN_C_END
 

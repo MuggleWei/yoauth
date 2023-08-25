@@ -14,7 +14,7 @@ void test_totp_sha1()
 {
 	const char *key = "BNsXVvBuaYMxt2b7";
 
-	yoauth_totp_t *totp = yoauth_totp_init(key, strlen(key), "SHA1");
+	yoauth_totp_data_t *totp = yoauth_totp_init(key, strlen(key), "SHA1");
 	TEST_ASSERT_NOT_NULL(totp);
 
 	int32_t code = yoauth_totp_at(totp, 1692770521);

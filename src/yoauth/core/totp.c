@@ -4,11 +4,11 @@
 #include "openssl/hmac.h"
 #include "openssl/err.h"
 
-yoauth_totp_t *yoauth_totp_init(const char *k, uint32_t klen,
-								const char *crypto)
+yoauth_totp_data_t *yoauth_totp_init(const char *k, uint32_t klen,
+									 const char *crypto)
 {
-	yoauth_totp_t *totp = NULL;
-	totp = (yoauth_totp_t *)malloc(sizeof(yoauth_totp_t));
+	yoauth_totp_data_t *totp = NULL;
+	totp = (yoauth_totp_data_t *)malloc(sizeof(yoauth_totp_data_t));
 	if (totp == NULL) {
 		LOG_ERROR("failed allocate memory space for TOTP object");
 		goto err_init;
@@ -48,7 +48,7 @@ err_init:
 	return totp;
 }
 
-int32_t yoauth_totp_at(yoauth_totp_t *totp, time_t ts)
+int32_t yoauth_totp_at(yoauth_totp_data_t *totp, time_t ts)
 {
 	EVP_MD_CTX *ctx = NULL;
 	EVP_MD *algo = NULL;
@@ -113,12 +113,12 @@ clean_totp_at:
 	return result;
 }
 
-int32_t yoauth_totp_now(yoauth_totp_t *totp)
+int32_t yoauth_totp_now(yoauth_totp_data_t *totp)
 {
 	return yoauth_totp_at(totp, time(NULL));
 }
 
-void yoauth_totp_destroy(yoauth_totp_t *totp)
+void yoauth_totp_destroy(yoauth_totp_data_t *totp)
 {
 	if (totp) {
 		free(totp);

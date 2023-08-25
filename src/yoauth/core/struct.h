@@ -30,14 +30,11 @@ enum {
 typedef struct yoauth_head {
 	char magic[4]; //!< magic word
 	uint32_t ver; //!< data version
-	uint32_t datalen; //!< data length
-	uint32_t datatype; //!< data type
+	uint32_t data_type; //!< data type, enum YOAUTH_DATA_TYPE
+	uint32_t data_size; //!< size of data unit
+	uint32_t cnt; //!< count of data
+	uint32_t reserved; //!< reserved field
 } yoauth_head_t;
-
-typedef struct yoauth_data_totp {
-	char account[16];
-	char key[16];
-} yoauth_data_totp_t;
 
 #pragma pack(pop)
 

@@ -1,8 +1,34 @@
-#include "handle.h"
+#include "tui.h"
+#include "scenes.h"
 
 typedef struct sys_args {
 	char user[16];
 } sys_args_t;
+
+void yoauth_show_usage()
+{
+	YOAUTH_STYLE_TITLE;
+	YOAUTH_OUTPUT_SPLIT_LINE;
+	YOAUTH_OUTPUT_TITLE("YoAuth version " YOAUTH_VERSION);
+	YOAUTH_OUTPUT_SPLIT_LINE;
+	YOAUTH_STYLE_NORMAL;
+
+	YOAUTH_OUTPUT("");
+	YOAUTH_OUTPUT("Usage:")
+	YOAUTH_OUTPUT("  yoauth [commands] [--options]")
+
+	YOAUTH_OUTPUT("");
+	YOAUTH_STYLE_TITLE;
+	YOAUTH_OUTPUT_SPLIT_LINE;
+	YOAUTH_OUTPUT_TITLE("Available commands");
+	YOAUTH_OUTPUT_SPLIT_LINE;
+	YOAUTH_STYLE_NORMAL;
+
+	YOAUTH_OUTPUT_COMMAND_DESC("yoauth", "login");
+	YOAUTH_OUTPUT_COMMAND_DESC("yoauth -u <user>", "login with specific user");
+	YOAUTH_OUTPUT_COMMAND_DESC("yoauth --user <user>",
+							   "login with specific user");
+}
 
 void parse_sys_args(int argc, char **argv, sys_args_t *args)
 {
@@ -58,7 +84,7 @@ int main(int argc, char *argv[])
 	sys_args_t args;
 	parse_sys_args(argc, argv, &args);
 
-	yoauth_message_loop(args.user);
+	yoauth_loop(args.user);
 
 	return 0;
 }
