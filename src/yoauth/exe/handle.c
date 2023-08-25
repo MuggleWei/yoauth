@@ -1,15 +1,5 @@
 #include "handle.h"
-#include <stdio.h>
-#include <termios.h>
-#include <signal.h>
-#include "yoauth/core/core.h"
-
-#define YOAUTH_OUTPUT_TITLE1_BLANK \
-	fprintf(stdout, "                            ")
-#define YOAUTH_OUTPUT_SPLIT_LINE                               \
-	fprintf(stdout, ""                                         \
-					"----------------------------------------" \
-					"----------------------------------------\n")
+#include "yoauth/exe/tui.h"
 
 static bool yoauth_root_dir(char *buf, size_t bufsize)
 {
@@ -82,45 +72,9 @@ static bool yoauth_user_data_path(const char *username, char *buf,
 	return true;
 }
 
-static void yoauth_password(char *buf, size_t bufsize)
+static int dict_totp_cmp(const void *p1, const void *p2)
 {
-	struct termios oldt, newt;
-	int i = 0;
-	int c = 0;
-
-	// saving the old settings
-	tcgetattr(STDIN_FILENO, &oldt);
-	memcpy(&newt, &oldt, sizeof(newt));
-
-	newt.c_lflag &= ~(ECHO);
-	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
-	while ((c = getchar()) != '\n' && c != EOF && i < (int)bufsize - 1) {
-		buf[i++] = c;
-	}
-	buf[i] = '\0';
-
-	// restore old settings
-	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-}
-
-static void yoauth_cleanup()
-{
-	fprintf(stdout, YOAUTH_ANSI_CLEAN_SCREEN);
-	fprintf(stdout, YOAUTH_ANSI_ALTER_BUF_OFF);
-	fprintf(stdout, YOAUTH_ANSI_CURSOR_ON);
-	fflush(stdout);
-}
-
-static void yoauth_cleanup_die(int signo)
-{
-	MUGGLE_UNUSED(signo);
-	exit(1);
-}
-
-static void yoauth_move_to(int16_t row, int16_t col)
-{
-	fprintf(stdout, YOAUTH_ANSI_ESC YOAUTH_ANSI_CSI "%u;%uH", row, col);
+	return strcmp((const char *)p1, (const char *)p2);
 }
 
 void yoauth_message_loop(const char *username)
@@ -131,70 +85,83 @@ void yoauth_message_loop(const char *username)
 		return;
 	}
 
+	// create new user
 	if (!muggle_path_exists(user_dir)) {
 		if (!yoauth_create_user(username)) {
 			YOAUTH_ERROR("failed create user");
+		} else {
+			YOAUTH_OUTPUT("success create user['%s']", username);
+		}
+		return;
+	}
+
+	// check password
+	char password[32];
+	yoauth_handle_t handle;
+	memset(&handle, 0, sizeof(handle));
+	int cnt = 0;
+	while (true) {
+		yoauth_get_password(password, sizeof(password));
+		if (yoauth_handle_init(&handle, username, password)) {
+			break;
+		}
+		if (++cnt == 3) {
+			YOAUTH_OUTPUT("already try 3 times, exit");
 			return;
 		}
 	}
 
-	fprintf(stdout, YOAUTH_ANSI_ALTER_BUF_ON);
-	atexit(yoauth_cleanup);
-	signal(SIGTERM, yoauth_cleanup_die);
-	signal(SIGINT, yoauth_cleanup_die);
+	yoauth_tui_setup();
 
-	fprintf(stdout, YOAUTH_ANSI_CLEAN_SCREEN);
-	fprintf(stdout, YOAUTH_ANSI_CURSOR_OFF);
+	yoauth_tui_t tui;
+	yoauth_tui_store(&tui);
+	yoauth_tui_close_echo(&tui);
 
 	while (true) {
-		yoauth_move_to(0, 0);
-
-		YOAUTH_STYLE_TIP;
-		fprintf(stdout, "a: ");
-		YOAUTH_STYLE_NORMAL;
-		fprintf(stdout, "add account & secret key;    ");
-		YOAUTH_STYLE_TIP;
-		fprintf(stdout, "d: ");
-		YOAUTH_STYLE_NORMAL;
-		fprintf(stdout, "delete account & secret key;    ");
-		YOAUTH_STYLE_TIP;
-		fprintf(stdout, "q: ");
-		YOAUTH_STYLE_NORMAL;
-		fprintf(stdout, "exit");
-		YOAUTH_OUTPUT("");
-		YOAUTH_OUTPUT_SPLIT_LINE;
-
-		// TODO:
-		YOAUTH_OUTPUT_COMMAND_DESC("weisz", "342623");
-		YOAUTH_OUTPUT_COMMAND_DESC("weisz", "342623");
+		yoauth_tui_move_to(0, 0);
+		yoauth_scenes_main(&handle, &tui);
 	}
+
+	yoauth_tui_cleanup();
 }
 
 void yoauth_show_usage()
 {
 	YOAUTH_STYLE_TITLE;
 	YOAUTH_OUTPUT_SPLIT_LINE;
-	YOAUTH_OUTPUT_TITLE1_BLANK;
-	YOAUTH_OUTPUT("YoAuth version " YOAUTH_VERSION);
+	YOAUTH_OUTPUT_TITLE("YoAuth version " YOAUTH_VERSION);
 	YOAUTH_OUTPUT_SPLIT_LINE;
 	YOAUTH_STYLE_NORMAL;
 
 	YOAUTH_OUTPUT("");
 	YOAUTH_OUTPUT("Usage:")
-	YOAUTH_OUTPUT("  yoauth [--options]")
+	YOAUTH_OUTPUT("  yoauth [commands] [--options]")
 
 	YOAUTH_OUTPUT("");
 	YOAUTH_STYLE_TITLE;
 	YOAUTH_OUTPUT_SPLIT_LINE;
-	YOAUTH_OUTPUT_TITLE1_BLANK;
-	YOAUTH_OUTPUT("Available commands");
+	YOAUTH_OUTPUT_TITLE("Available commands");
 	YOAUTH_OUTPUT_SPLIT_LINE;
 	YOAUTH_STYLE_NORMAL;
 
-	YOAUTH_OUTPUT_COMMAND_DESC("yoauth", "login with default user");
-	YOAUTH_OUTPUT_COMMAND_DESC("yoauth -u <username>", "login with <username>");
-	YOAUTH_OUTPUT_COMMAND_DESC("yoauth --user <username>",
-							   "login with <username>");
+	YOAUTH_OUTPUT_COMMAND_DESC("yoauth", "login");
+	YOAUTH_OUTPUT_COMMAND_DESC(
+		"yoauth add -a <account> -s <base32 key>",
+		"add account");
+	YOAUTH_OUTPUT_COMMAND_DESC("yoauth del -a <account>", "delete account");
+
+	YOAUTH_OUTPUT("");
+	YOAUTH_STYLE_TITLE;
+	YOAUTH_OUTPUT_SPLIT_LINE;
+	YOAUTH_OUTPUT_TITLE("Example");
+	YOAUTH_OUTPUT_SPLIT_LINE;
+	YOAUTH_STYLE_NORMAL;
+
+	YOAUTH_OUTPUT("yoauth")
+	YOAUTH_OUTPUT("  login and show all TOTP code");
+	YOAUTH_OUTPUT("");
+
+	YOAUTH_OUTPUT("yoauth add -a google -s ")
 }
 
 bool yoauth_create_user(const char *username)
@@ -202,15 +169,11 @@ bool yoauth_create_user(const char *username)
 	YOAUTH_OUTPUT("user['%s'] first login, plz enter password", username);
 
 	char passwd1[32];
-	fprintf(stdout, "enter password: ");
-	fflush(stdout);
-	yoauth_password(passwd1, sizeof(passwd1));
+	yoauth_tui_passwd("enter password: ", passwd1, sizeof(passwd1));
 	YOAUTH_OUTPUT("")
 
 	char passwd2[32];
-	fprintf(stdout, "enter password again: ");
-	fflush(stdout);
-	yoauth_password(passwd2, sizeof(passwd2));
+	yoauth_tui_passwd("enter password again: ", passwd2, sizeof(passwd2));
 	YOAUTH_OUTPUT("");
 
 	if (strcmp(passwd1, passwd2) != 0) {
@@ -237,4 +200,75 @@ bool yoauth_create_user(const char *username)
 	}
 
 	return true;
+}
+
+void yoauth_get_password(char *buf, size_t bufsize)
+{
+	yoauth_tui_passwd("enter password: ", buf, bufsize);
+	YOAUTH_OUTPUT("")
+}
+
+bool yoauth_handle_init(yoauth_handle_t *handle, const char *username,
+						const char *password)
+{
+	memset(handle, 0, sizeof(*handle));
+	handle->username = username;
+	handle->password = password;
+
+	if (!muggle_avl_tree_init(&handle->dict_totp, dict_totp_cmp, 0)) {
+		YOAUTH_ERROR("failed init dict");
+		return false;
+	}
+
+	char filepath[MUGGLE_MAX_PATH];
+	if (!yoauth_user_data_path(username, filepath, sizeof(filepath))) {
+		YOAUTH_ERROR("failed load user data");
+		return false;
+	}
+
+	if (!muggle_path_exists(filepath)) {
+		YOAUTH_ERROR("user file not exists");
+		return false;
+	}
+
+	unsigned long numbytes = 0;
+	yoauth_head_t *hdr = (yoauth_head_t *)yoauth_fileutils_load_totp(
+		filepath, handle->password, &numbytes);
+	if (hdr == NULL) {
+		YOAUTH_ERROR("failed load user data, plz check your password");
+		return false;
+	}
+
+	uint32_t cnt = hdr->datalen / sizeof(yoauth_data_totp_t);
+	yoauth_data_totp_t *datas = (yoauth_data_totp_t *)(hdr + 1);
+	for (uint32_t i = 0; i < cnt; i++) {
+		char *k = (char *)malloc(sizeof(datas[i].account));
+		memcpy(k, datas[i].account, sizeof(datas[i].account));
+		yoauth_totp_t *v =
+			yoauth_totp_init(datas[i].key, sizeof(datas[i].key), NULL);
+		muggle_avl_tree_insert(&handle->dict_totp, k, v);
+	}
+
+	free(hdr);
+
+	return true;
+}
+
+void yoauth_scenes_main(yoauth_handle_t *handle, yoauth_tui_t *tui)
+{
+	// page head
+	YOAUTH_STYLE_TIP;
+	fprintf(stdout, "a: ");
+	YOAUTH_STYLE_NORMAL;
+	fprintf(stdout, "add account & secret key;    ");
+	YOAUTH_STYLE_TIP;
+	fprintf(stdout, "d: ");
+	YOAUTH_STYLE_NORMAL;
+	fprintf(stdout, "delete account & secret key;    ");
+	YOAUTH_STYLE_TIP;
+	fprintf(stdout, "q: ");
+	YOAUTH_STYLE_NORMAL;
+	fprintf(stdout, "exit");
+	YOAUTH_OUTPUT("");
+	YOAUTH_OUTPUT_SPLIT_LINE;
 }
