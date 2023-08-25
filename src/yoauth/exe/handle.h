@@ -51,8 +51,8 @@ EXTERN_C_BEGIN
 		fprintf(stdout, format "\n", ##__VA_ARGS__); \
 	} while (0);
 
-#define YOAUTH_ERROR(format, ...)       \
-	YOAUTH_STYLE_ERROR;                 \
+#define YOAUTH_ERROR(format, ...)         \
+	YOAUTH_STYLE_ERROR;                   \
 	YOAUTH_OUTPUT(format, ##__VA_ARGS__); \
 	YOAUTH_STYLE_NORMAL;
 
@@ -68,24 +68,25 @@ EXTERN_C_BEGIN
 		fprintf(stdout, desc "\n");               \
 	} while (0);
 
+#define YOAUTH_ANSI_ALTER_BUF_ON YOAUTH_ANSI_ESC YOAUTH_ANSI_CSI "?1049h"
+#define YOAUTH_ANSI_ALTER_BUF_OFF YOAUTH_ANSI_ESC YOAUTH_ANSI_CSI "?1049l"
+#define YOAUTH_ANSI_CURSOR_ON YOAUTH_ANSI_ESC YOAUTH_ANSI_CSI "?25h"
+#define YOAUTH_ANSI_CURSOR_OFF YOAUTH_ANSI_ESC YOAUTH_ANSI_CSI "?25l"
+#define YOAUTH_ANSI_CLEAN_SCREEN YOAUTH_ANSI_ESC YOAUTH_ANSI_CSI "2J"
+
 typedef struct yoauth_handle {
-	char *user;
-	const char *data_dir;
+	const char *user;
+	const char *user_dir;
 	uint32_t nargs;
 	char *args[32];
 } yoauth_handle_t;
 
 /**
- * @brief show welcome information
- *
- * @return  boolean value
- */
-bool yoauth_show_welcome_info();
-
-/**
  * @brief message loop
+ *
+ * @param username  user name
  */
-void yoauth_message_loop();
+void yoauth_message_loop(const char *username);
 
 /**
  * @brief show Usage information
@@ -93,12 +94,13 @@ void yoauth_message_loop();
 void yoauth_show_usage();
 
 /**
- * @brief parse user input into handle.args
+ * @brief create new user
  *
- * @param handle  yoauth handle pointer
- * @param input   user input
+ * @param username  user name
+ *
+ * @return boolean value
  */
-void yoauth_parse_input(yoauth_handle_t *handle, char *input);
+bool yoauth_create_user(const char *username);
 
 EXTERN_C_END
 
