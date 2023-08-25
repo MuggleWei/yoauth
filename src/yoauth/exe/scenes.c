@@ -50,6 +50,8 @@ void yoauth_loop(const char *username)
 	}
 
 	yoauth_tui_cleanup();
+
+	yoauth_handle_destroy(&handle);
 }
 
 bool yoauth_create_user(const char *username)
@@ -93,6 +95,8 @@ bool yoauth_create_user(const char *username)
 
 void yoauth_scenes_main(yoauth_handle_t *handle, yoauth_tui_t *tui)
 {
+	yoauth_tui_move_to(0, 0);
+
 	// page head
 	YOAUTH_STYLE_TIP;
 	fprintf(stdout, "a: ");

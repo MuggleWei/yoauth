@@ -1,6 +1,5 @@
 #include "tui.h"
 #include <signal.h>
-#include <conio.h>
 
 void yoauth_tui_setup()
 {
@@ -71,7 +70,6 @@ void yoauth_tui_passwd(const char *tip, char *buf, size_t bufsize)
 	char newline = '\n';
 #endif
 	while ((c = yoauth_win_getch()) != newline && c != EOF && i < (int)bufsize - 1) {
-		// YOAUTH_OUTPUT("%c(%d)", (char)c, c);
 		if (c == 8 && i != 0) {
 			i--;
 			continue;
