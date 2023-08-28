@@ -27,8 +27,6 @@ void yoauth_show_usage()
 	YOAUTH_OUTPUT_COMMAND_DESC("  -a, --add", "add new account");
 	YOAUTH_OUTPUT_COMMAND_DESC("  -d, --delete", "delete account");
 	YOAUTH_OUTPUT_COMMAND_DESC("  -s, --secret", "secret key for new account");
-	YOAUTH_OUTPUT_COMMAND_DESC("", "  - 16 bytes for text");
-	YOAUTH_OUTPUT_COMMAND_DESC("", "  - other for base32 format");
 
 	YOAUTH_OUTPUT("");
 	YOAUTH_STYLE_TITLE;
@@ -47,10 +45,6 @@ void yoauth_show_usage()
 
 	YOAUTH_OUTPUT("yoauth -a gitlab -s 06Y8nuqqNdwo8oHd");
 	YOAUTH_OUTPUT("  add account and TOTP secret key");
-	YOAUTH_OUTPUT("");
-
-	YOAUTH_OUTPUT("yoauth -a gitlab -s GA3FSODOOVYXCTTEO5XTQ32IMQ");
-	YOAUTH_OUTPUT("  add account and TOTP secret key with base32 format");
 	YOAUTH_OUTPUT("");
 
 	YOAUTH_OUTPUT("yoauth -d gitlab");
@@ -115,17 +109,12 @@ void parse_sys_args(int argc, char **argv, sys_args_t *args)
 			strncpy(args->del_account, optarg, len);
 		} break;
 		case 's': {
-			int len = strlen(optarg);
-			if (len == 16) {
-				memcpy(args->secret, optarg, 16);
-			} else {
-				int cnt = base32_decode((unsigned char *)optarg,
-										(unsigned char *)args->secret,
-										sizeof(args->secret));
-				if (cnt != sizeof(args->secret)) {
-					YOAUTH_ERROR("failed base32 decode");
-					exit(EXIT_FAILURE);
-				}
+			args->keylen = base32_decode((unsigned char *)optarg,
+										 (unsigned char *)args->secret,
+										 sizeof(args->secret));
+			if (args->keylen < 0) {
+				YOAUTH_ERROR("failed base32 decode");
+				exit(EXIT_FAILURE);
 			}
 		} break;
 		default: {

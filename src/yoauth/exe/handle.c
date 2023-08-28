@@ -99,9 +99,9 @@ static int cmp_totp_data(const void *d1, const void *d2)
 }
 
 bool yoauth_handle_add(yoauth_handle_t *handle, const char *account,
-					   const char *secret)
+					   const char *secret, int keylen)
 {
-	yoauth_totp_data_t *data = yoauth_totp_init(secret, 16, NULL);
+	yoauth_totp_data_t *data = yoauth_totp_init(secret, keylen, NULL);
 	if (data == NULL) {
 		YOAUTH_ERROR("failed init totp data");
 		return false;

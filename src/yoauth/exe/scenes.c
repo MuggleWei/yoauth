@@ -41,7 +41,8 @@ void yoauth_loop(sys_args_t *args)
 	}
 
 	if (args->add_account[0] != '\0') {
-		if (!yoauth_handle_add(&handle, args->add_account, args->secret)) {
+		if (!yoauth_handle_add(&handle, args->add_account, args->secret,
+							   args->keylen)) {
 			YOAUTH_ERROR("failed add account");
 		} else {
 			yoauth_handle_dumps(&handle);
