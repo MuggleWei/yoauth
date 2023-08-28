@@ -4,7 +4,7 @@
 #include "openssl/hmac.h"
 #include "openssl/err.h"
 
-yoauth_totp_data_t *yoauth_totp_init(const char *k, uint32_t klen,
+yoauth_totp_data_t *yoauth_totp_init(const unsigned char *k, uint32_t klen,
 									 const char *crypto)
 {
 	yoauth_totp_data_t *totp = NULL;

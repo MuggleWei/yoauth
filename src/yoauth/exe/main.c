@@ -89,7 +89,7 @@ void parse_sys_args(int argc, char **argv, sys_args_t *args)
 				YOAUTH_ERROR("length of user beyond the limit(15)");
 				exit(EXIT_FAILURE);
 			}
-			strncpy(args->user, optarg, len);
+			strncpy(args->user, optarg, sizeof(args->user) - 1);
 			args->user[len] = '\0';
 		} break;
 		case 'a': {
@@ -98,7 +98,7 @@ void parse_sys_args(int argc, char **argv, sys_args_t *args)
 				YOAUTH_ERROR("length of add_account beyond the limit(15)");
 				exit(EXIT_FAILURE);
 			}
-			strncpy(args->add_account, optarg, len);
+			strncpy(args->add_account, optarg, sizeof(args->add_account));
 		} break;
 		case 'd': {
 			int len = strlen(optarg);
@@ -106,7 +106,7 @@ void parse_sys_args(int argc, char **argv, sys_args_t *args)
 				YOAUTH_ERROR("length of del_account beyond the limit(15)");
 				exit(EXIT_FAILURE);
 			}
-			strncpy(args->del_account, optarg, len);
+			strncpy(args->del_account, optarg, sizeof(args->del_account) - 1);
 		} break;
 		case 's': {
 			args->keylen = base32_decode((unsigned char *)optarg,

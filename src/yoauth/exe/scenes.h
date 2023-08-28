@@ -20,7 +20,10 @@ typedef struct sys_args {
 	char password[32];
 	char add_account[16];
 	char del_account[16];
-	char secret[16];
+	// HMAC-SHA1 - 20 bytes
+	// HMAC-SHA256 - 32 bytes
+	// HMAC-SHA512 - 64 bytes
+	char secret[64];
 	int keylen;
 } sys_args_t;
 

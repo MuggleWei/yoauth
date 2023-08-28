@@ -41,8 +41,8 @@ void yoauth_loop(sys_args_t *args)
 	}
 
 	if (args->add_account[0] != '\0') {
-		if (!yoauth_handle_add(&handle, args->add_account, args->secret,
-							   args->keylen)) {
+		if (!yoauth_handle_add(&handle, args->add_account,
+							   (unsigned char *)args->secret, args->keylen)) {
 			YOAUTH_ERROR("failed add account");
 		} else {
 			yoauth_handle_dumps(&handle);
@@ -131,7 +131,7 @@ void yoauth_scenes_main(yoauth_handle_t *handle, yoauth_tui_t *tui)
 		yoauth_totp_data_t *data = (yoauth_totp_data_t *)node->data;
 		int32_t code = yoauth_totp_at(data, ts);
 		char v[16];
-		snprintf(v, sizeof(v), "%d", code);
+		snprintf(v, sizeof(v), "%06d", code);
 		YOAUTH_OUTPUT_KV(data->account, v, sizeof(data->account) + 2);
 	}
 
