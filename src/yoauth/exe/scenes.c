@@ -47,8 +47,8 @@ void yoauth_loop(sys_args_t *args)
 			yoauth_handle_dumps(&handle);
 		}
 	} else if (args->del_account[0] != '\0') {
-		if (!yoauth_handle_del(&handle, args->add_account)) {
-			YOAUTH_ERROR("failed add account");
+		if (!yoauth_handle_del(&handle, args->del_account)) {
+			YOAUTH_ERROR("failed delete account");
 		} else {
 			yoauth_handle_dumps(&handle);
 		}

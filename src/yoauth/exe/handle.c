@@ -119,6 +119,8 @@ bool yoauth_handle_add(yoauth_handle_t *handle, const char *account,
 		return false;
 	}
 
+	handle->head.cnt++;
+
 	return true;
 }
 
@@ -145,6 +147,8 @@ bool yoauth_handle_del(yoauth_handle_t *handle, const char *account)
 		YOAUTH_ERROR("account['%s'] not exists", account);
 		return false;
 	}
+
+	handle->head.cnt--;
 
 	return true;
 }

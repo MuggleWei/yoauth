@@ -75,7 +75,7 @@ void parse_sys_args(int argc, char **argv, sys_args_t *args)
 	while (true) {
 		int c = 0;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "hvu:a:s:", long_options, &option_index);
+		c = getopt_long(argc, argv, "hvu:a:s:d:", long_options, &option_index);
 		if (c == -1) {
 			break;
 		}
