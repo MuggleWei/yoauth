@@ -71,7 +71,7 @@ else()
 	message(FATAL_ERROR "failed found mugglec")
 endif()
 
-find_package(OpenSSL)
+find_package(OpenSSL 3 REQUIRED)
 if (OPENSSL_FOUND)
 	message("deps openssl version: ${OPENSSL_VERSION}")
 	message("deps openssl include dir: ${OPENSSL_INCLUDE_DIR}")
@@ -80,6 +80,14 @@ if (OPENSSL_FOUND)
 else()
 	message(FATAL_ERROR "Can't find openssl")
 endif()
+
+#include(${CMAKE_CURRENT_LIST_DIR}/cmake/FindNcurses.cmake)
+#if (NCURSES_FOUND)
+#    message("find ncurses include dir: ${NCURSES_INCLUDE_DIR}")
+#    message("find ncurses lib: ${NCURSES_LIBRARIES}")
+#else()
+#    message(FATAL_ERROR "Can't find ncurses")
+#endif()
 
 message("# find dependencies end")
 message("------------------------------")
@@ -120,33 +128,157 @@ configure_file(
 FILE(GLOB_RECURSE yoauth_gen_h "${yoauth_gen_dir}/yoauth/*.h")
 
 # lib
-FILE(GLOB_RECURSE yoauth_src "${yoauth_src_dir}/yoauth/*.c")
-FILE(GLOB_RECURSE yoauth_h "${yoauth_src_dir}/yoauth/*.h")
-LIST(REMOVE_ITEM yoauth_src "${yoauth_src_dir}/yoauth/main.c")
-add_library(yoauth ${YOAUTH_LIB_TYPE}
-	${yoauth_src}
-	${yoauth_h}
+set(yoauth_core yoauth_core)
+FILE(GLOB_RECURSE yoauth_core_src "${yoauth_src_dir}/yoauth/core/*.c")
+FILE(GLOB_RECURSE yoauth_core_h "${yoauth_src_dir}/yoauth/core/*.h")
+add_library(${yoauth_core} ${YOAUTH_LIB_TYPE}
+	${yoauth_core_src}
+	${yoauth_core_h}
 	${yoauth_gen_h})
-target_include_directories(yoauth PUBLIC
+target_include_directories(${yoauth_core} PUBLIC
 	$<BUILD_INTERFACE:${yoauth_src_dir}>
 	$<BUILD_INTERFACE:${yoauth_gen_dir}>
 	$<INSTALL_INTERFACE:include>)
-target_link_libraries(yoauth mugglec "${OPENSSL_CRYPTO_LIBRARY}")
+target_link_libraries(${yoauth_core} mugglec "${OPENSSL_CRYPTO_LIBRARY}")
 if (UNIX)
-	target_link_libraries(yoauth m)
+	target_link_libraries(${yoauth_core} m)
 endif()
-target_compile_definitions(yoauth
+target_compile_definitions(${yoauth_core}
 	PRIVATE YOAUTH_EXPORTS MUGGLE_HOLD_LOG_MACRO)
-set_target_properties(yoauth PROPERTIES
+set_target_properties(${yoauth_core} PROPERTIES
 	DEBUG_POSTFIX d
 	VERSION ${YOAUTH_VERSION}
 	SOVERSION ${YOAUTH_VERSION_MAJOR})
 
+if (APPLE)
+	set_target_properties(${yoauth_core}
+		PROPERTIES
+		INSTALL_RPATH "@executable_path/../lib")
+elseif (UNIX)
+	set_target_properties(${yoauth_core}
+		PROPERTIES
+		INSTALL_RPATH "\$ORIGIN/../lib")
+endif()
+
+# exe
+set(yoauth_exe yoauth)
+FILE(GLOB_RECURSE yoauth_exe_c "${yoauth_src_dir}/yoauth/exe/*.c")
+FILE(GLOB_RECURSE yoauth_exe_h "${yoauth_src_dir}/yoauth/exe/*.h")
+add_executable(${yoauth_exe} ${yoauth_exe_c} ${yoauth_exe_h})
+add_dependencies(${yoauth_exe} ${yoauth_core})
+target_include_directories(${yoauth_exe} PUBLIC
+	${NCURSES_INCLUDE_DIR})
+target_link_libraries(${yoauth_exe} ${yoauth_core} ${NCURSES_LIBRARIES})
+target_compile_definitions(${yoauth_exe}
+	PUBLIC MUGGLE_HOLD_LOG_MACRO)
+set_target_properties(${yoauth_exe} PROPERTIES
+	DEBUG_POSTFIX d
+	VERSION ${YOAUTH_VERSION}
+	SOVERSION ${YOAUTH_VERSION_MAJOR})
+
+if (MSVC OR MINGW)
+	set_target_properties(${yoauth_exe}
+		PROPERTIES
+		VS_DEBUGGER_WORKING_DIRECTORY "$(OutDir)")
+else()
+	if (APPLE)
+		set_target_properties(${yoauth_exe}
+			PROPERTIES
+			INSTALL_RPATH "@executable_path/../lib")
+	elseif (UNIX)
+		set_target_properties(${yoauth_exe}
+			PROPERTIES
+			INSTALL_RPATH "\$ORIGIN/../lib")
+	endif()
+endif()
+
+# for debug
+function(muggle_copy_dir_target name src_dir dst_dir)
+	file(GLOB_RECURSE src_files "${src_dir}/*")
+	foreach(src_file ${src_files})
+		file(RELATIVE_PATH rel_path ${src_dir} ${src_file})
+		set(dst_file "${dst_dir}/${rel_path}")
+		add_custom_command(
+			OUTPUT "${dst_file}"
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${src_file}" ${dst_file}
+			DEPENDS "${src_file}"
+			COMMENT "copy ${src_file} to ${dst_file}"
+		)
+		list(APPEND dst_files "${dst_file}")
+	endforeach()
+	add_custom_target(${name} ALL DEPENDS ${dst_files})
+endfunction()
+
+if (WIN32)
+	foreach(subdir ${CMAKE_PREFIX_PATH})
+		file(GLOB dll_files "${subdir}/bin/*.dll")
+		foreach(src_file ${dll_files})
+			file(RELATIVE_PATH rel_path ${src_file} ${subdir}/bin)
+			get_filename_component(dst_name ${src_file} NAME)
+			set(dst_file "$(OutDir)${dst_name}")
+			add_custom_command(
+				TARGET ${yoauth_core}
+				POST_BUILD
+				COMMAND ${CMAKE_COMMAND} -E copy_if_different "${src_file}" ${dst_file}
+				DEPENDS "${src_file}"
+				COMMENT "sync ${src_file} to ${dst_file}"
+			)
+		endforeach(src_file ${dll_files})
+	endforeach(subdir ${CMAKE_PREFIX_PATH})
+else()
+	# # ncurse share resources
+	# foreach(search_dir ${CMAKE_PREFIX_PATH})
+	# 	file(GLOB children RELATIVE "${search_dir}" "${search_dir}/*")
+	# 	foreach(child ${children})
+	# 		if ("${child}" STREQUAL "share")
+	# 			file(GLOB share_dirs RELATIVE "${search_dir}/${child}" "${search_dir}/${child}/*")
+	# 			foreach(share_dir ${share_dirs})
+	# 				if (("${share_dir}" STREQUAL "tabset") OR ("${share_dir}" STREQUAL "terminfo"))
+	# 					set(res_path "${search_dir}/${child}/${share_dir}")
+	# 					set(dst_path "${CMAKE_BINARY_DIR}/share/${share_dir}")
+	# 					add_custom_command(
+	# 						TARGET ${yoauth_exe}
+	# 						POST_BUILD
+	# 						COMMAND ${CMAKE_COMMAND} -E copy_directory "${res_path}" "${dst_path}"
+	# 						DEPENDS "${res_path}"
+	# 						COMMENT "sync ${res_path} to ${dst_path}"
+	# 						)
+	# 				endif()
+	# 			endforeach()
+	# 		endif()
+	# 	endforeach()
+	# endforeach(search_dir ${CMAKE_PREFIX_PATH})
+endif()
+
 ################################
 # install
 ################################
-install(IMPORTED_RUNTIME_ARTIFACTS mugglec)
-install(FILES "${OPENSSL_CRYPTO_LIBRARY}" DESTINATION ${CMAKE_INSTALL_LIBDIR})
+include(GNUInstallDirs)
+install(TARGETS ${yoauth_core} ${yoauth_exe}
+	RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+if (WIN32)
+	foreach(subdir ${CMAKE_PREFIX_PATH})
+		file(GLOB dll_files "${subdir}/bin/*.dll")
+		foreach(src_file ${dll_files})
+			string(REPLACE "\\" "/" src_file "${src_file}")
+			install(FILES
+				"${src_file}"
+				DESTINATION ${CMAKE_INSTALL_BINDIR})
+		endforeach(src_file ${dll_files})
+	endforeach(subdir ${CMAKE_PREFIX_PATH})
+else()
+	foreach(subdir ${CMAKE_PREFIX_PATH})
+		file(GLOB shared_files "${subdir}/lib/*.so*")
+		foreach(src_file ${shared_files})
+			string(REPLACE "\\" "/" src_file "${src_file}")
+			install(FILES
+				"${src_file}"
+				DESTINATION ${CMAKE_INSTALL_LIBDIR})
+		endforeach(src_file ${shared_files})
+	endforeach(subdir ${CMAKE_PREFIX_PATH})
+endif()
 
 ################################
 # tests
@@ -163,8 +295,8 @@ function(add_unittest name folder)
 	else()
 		add_executable(${name} ${tmp_c})
 	endif(MSVC OR MINGW)
-	add_dependencies(${name} yoauth)
-	target_link_libraries(${name} yoauth unity::framework)
+	add_dependencies(${name} ${yoauth_core})
+	target_link_libraries(${name} ${yoauth_core} unity::framework)
 
 	add_test(NAME ${name} COMMAND ${name})
 endfunction()

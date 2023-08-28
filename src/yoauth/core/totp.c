@@ -4,11 +4,11 @@
 #include "openssl/hmac.h"
 #include "openssl/err.h"
 
-yoauth_totp_t *yoauth_totp_init(const char *k, uint32_t klen,
-								const char *crypto)
+yoauth_totp_data_t *yoauth_totp_init(const char *k, uint32_t klen,
+									 const char *crypto)
 {
-	yoauth_totp_t *totp = NULL;
-	totp = (yoauth_totp_t *)malloc(sizeof(yoauth_totp_t));
+	yoauth_totp_data_t *totp = NULL;
+	totp = (yoauth_totp_data_t *)malloc(sizeof(yoauth_totp_data_t));
 	if (totp == NULL) {
 		LOG_ERROR("failed allocate memory space for TOTP object");
 		goto err_init;
@@ -17,10 +17,10 @@ yoauth_totp_t *yoauth_totp_init(const char *k, uint32_t klen,
 	memset(totp, 0, sizeof(*totp));
 
 	if (crypto == NULL) {
-		strncpy(totp->crypto, "SHA1", sizeof(totp->crypto) - 1);
+		strncpy(totp->algo, "SHA1", sizeof(totp->algo) - 1);
 	} else if (strcmp(crypto, "SHA1") == 0 || strcmp(crypto, "SHA256") == 0 ||
 			   strcmp(crypto, "SHA512") == 0) {
-		strncpy(totp->crypto, crypto, sizeof(totp->crypto) - 1);
+		strncpy(totp->algo, crypto, sizeof(totp->algo) - 1);
 	} else {
 		LOG_ERROR(
 			"unsupport crypto algorithm for TOTP, support SHA1/SHA256/SHA512");
@@ -48,7 +48,7 @@ err_init:
 	return totp;
 }
 
-int32_t yoauth_totp_at(yoauth_totp_t *totp, time_t ts)
+int32_t yoauth_totp_at(yoauth_totp_data_t *totp, time_t ts)
 {
 	EVP_MD_CTX *ctx = NULL;
 	EVP_MD *algo = NULL;
@@ -65,9 +65,9 @@ int32_t yoauth_totp_at(yoauth_totp_t *totp, time_t ts)
 				  ERR_reason_error_string(ERR_get_error()));
 		goto clean_totp_at;
 	}
-	algo = EVP_MD_fetch(NULL, totp->crypto, NULL);
+	algo = EVP_MD_fetch(NULL, totp->algo, NULL);
 	if (algo == NULL) {
-		LOG_ERROR("EVP_MD_fetch %s failed: %s", totp->crypto,
+		LOG_ERROR("EVP_MD_fetch %s failed: %s", totp->algo,
 				  ERR_reason_error_string(ERR_get_error()));
 		goto clean_totp_at;
 	}
@@ -113,12 +113,12 @@ clean_totp_at:
 	return result;
 }
 
-int32_t yoauth_totp_now(yoauth_totp_t *totp)
+int32_t yoauth_totp_now(yoauth_totp_data_t *totp)
 {
 	return yoauth_totp_at(totp, time(NULL));
 }
 
-void yoauth_totp_destroy(yoauth_totp_t *totp)
+void yoauth_totp_destroy(yoauth_totp_data_t *totp)
 {
 	if (totp) {
 		free(totp);

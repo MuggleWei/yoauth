@@ -3,15 +3,14 @@
  *  @author       Muggle Wei
  *  @email        mugglewei@gmail.com
  *  @date         2023-08-23
- *  @copyright    Copyright 2023 Muggle Wei
  *  @license      LGPL-3.0
- *  @brief        yoauth TOTP
+ *  @brief        yoauth core TOTP
  *****************************************************************************/
 
-#ifndef YOAUTH_TOTP_H_
-#define YOAUTH_TOTP_H_
+#ifndef YOAUTH_CORE_TOTP_H_
+#define YOAUTH_CORE_TOTP_H_
 
-#include "yoauth/macro.h"
+#include "yoauth/core/macro.h"
 #include <stdint.h>
 #include <time.h>
 
@@ -20,13 +19,18 @@ EXTERN_C_BEGIN
 #define YOAUTH_TOTP_KEY_SIZE 64
 #define YOAUTH_TOTP_DEFAULT_TIME_STEP 30
 
-typedef struct yoauth_totp {
-	char crypto[16]; //!< crypto function to use
+#pragma pack(push, 8)
+
+typedef struct yoauth_totp_data {
+	char account[16]; //!< account
 	char key[YOAUTH_TOTP_KEY_SIZE]; //!< secret key
+	char algo[16]; //!< crypto function to use
 	uint32_t keylen; //!< length of secret key
 	uint32_t return_digits; //!< number of digits to return
 	uint64_t time_step; //!< TOTP time step in seconds
-} yoauth_totp_t;
+} yoauth_totp_data_t;
+
+#pragma pack(pop)
 
 /**
  * @brief init TOTP object
@@ -38,8 +42,8 @@ typedef struct yoauth_totp {
  * @return  TOTP object pointer
  */
 YOAUTH_EXPORT
-yoauth_totp_t *yoauth_totp_init(const char *k, uint32_t klen,
-								const char *crypto);
+yoauth_totp_data_t *yoauth_totp_init(const char *k, uint32_t klen,
+									 const char *crypto);
 
 /**
  * @brief generate TOTP code at the timestamp
@@ -50,7 +54,7 @@ yoauth_totp_t *yoauth_totp_init(const char *k, uint32_t klen,
  * @return TOTP code
  */
 YOAUTH_EXPORT
-int32_t yoauth_totp_at(yoauth_totp_t *totp, time_t ts);
+int32_t yoauth_totp_at(yoauth_totp_data_t *totp, time_t ts);
 
 /**
  * @brief generate current time TOTP code
@@ -60,7 +64,7 @@ int32_t yoauth_totp_at(yoauth_totp_t *totp, time_t ts);
  * @return 
  */
 YOAUTH_EXPORT
-int32_t yoauth_totp_now(yoauth_totp_t *totp);
+int32_t yoauth_totp_now(yoauth_totp_data_t *totp);
 
 /**
  * @brief 
@@ -68,7 +72,7 @@ int32_t yoauth_totp_now(yoauth_totp_t *totp);
  * @param totp  TOTP object pointer
  */
 YOAUTH_EXPORT
-void yoauth_totp_destroy(yoauth_totp_t *totp);
+void yoauth_totp_destroy(yoauth_totp_data_t *totp);
 
 EXTERN_C_END
 
