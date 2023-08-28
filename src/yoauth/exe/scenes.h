@@ -15,21 +15,29 @@
 
 EXTERN_C_BEGIN
 
+typedef struct sys_args {
+	char user[16];
+	char password[32];
+	char add_account[16];
+	char del_account[16];
+	char secret[16];
+} sys_args_t;
+
 /**
  * @brief message loop
  *
- * @param username  user name
+ * @param args  system input arguments
  */
-void yoauth_loop(const char *username);
+void yoauth_loop(sys_args_t *args);
 
 /**
  * @brief create new user
  *
- * @param username user name
+ * @param args  system input arguments
  *
  * @return boolean value
  */
-bool yoauth_create_user(const char *username);
+bool yoauth_create_user(sys_args_t *args);
 
 /**
  * @brief main scenes

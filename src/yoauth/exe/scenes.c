@@ -3,66 +3,79 @@
 #include "tui.h"
 #include "handle.h"
 
-void yoauth_loop(const char *username)
+void yoauth_loop(sys_args_t *args)
 {
+	yoauth_handle_t handle;
+	memset(&handle, 0, sizeof(handle));
+
 	char user_dir[MUGGLE_MAX_PATH];
-	if (!yoauth_path_user_dir(username, user_dir, sizeof(user_dir))) {
+	if (!yoauth_path_user_dir(args->user, user_dir, sizeof(user_dir))) {
 		YOAUTH_ERROR("failed get user dir");
 		return;
 	}
 
 	if (!muggle_path_exists(user_dir)) {
 		// create new user
-		if (!yoauth_create_user(username)) {
+		if (!yoauth_create_user(args)) {
 			YOAUTH_ERROR("failed create user");
 		} else {
 			YOAUTH_OUTPUT("success create user['%s'], exit; plz relogin",
-						  username);
+						  args->user);
 		}
 		return;
-	}
-
-	// check password
-	yoauth_handle_t handle;
-	memset(&handle, 0, sizeof(handle));
-
-	int cnt = 0;
-	char password[32];
-	while (true) {
-		yoauth_tui_passwd("enter password: ", password, sizeof(password));
-		if (yoauth_handle_init(&handle, username, password)) {
-			break;
-		}
-		if (++cnt == 3) {
-			YOAUTH_OUTPUT("already try 3 times, exit");
-			return;
+	} else {
+		int cnt = 0;
+		while (true) {
+			yoauth_tui_passwd("enter password: ", args->password,
+							  sizeof(args->password));
+			// check password
+			if (yoauth_handle_init(&handle, args->user, args->password)) {
+				YOAUTH_OUTPUT("");
+				break;
+			}
+			if (++cnt == 3) {
+				YOAUTH_ERROR("already try 3 times, exit");
+				return;
+			}
 		}
 	}
 
-	yoauth_tui_setup();
+	if (args->add_account[0] != '\0') {
+		if (!yoauth_handle_add(&handle, args->add_account, args->secret)) {
+			YOAUTH_ERROR("failed add account");
+		} else {
+			yoauth_handle_dumps(&handle);
+		}
+	} else if (args->del_account[0] != '\0') {
+		if (!yoauth_handle_del(&handle, args->add_account)) {
+			YOAUTH_ERROR("failed add account");
+		} else {
+			yoauth_handle_dumps(&handle);
+		}
+	} else {
+		yoauth_tui_setup();
 
-	yoauth_tui_t tui;
-	yoauth_tui_store(&tui);
-	yoauth_tui_close_echo(&tui);
+		yoauth_tui_t tui;
+		yoauth_tui_store(&tui);
+		yoauth_tui_close_echo(&tui);
 
-	while (true) {
 		yoauth_scenes_main(&handle, &tui);
+
+		yoauth_tui_cleanup();
+
+		yoauth_handle_destroy(&handle);
 	}
-
-	yoauth_tui_cleanup();
-
-	yoauth_handle_destroy(&handle);
 }
 
-bool yoauth_create_user(const char *username)
+bool yoauth_create_user(sys_args_t *args)
 {
-	YOAUTH_OUTPUT("user['%s'] first login, plz enter password", username);
+	YOAUTH_OUTPUT("user['%s'] first login, plz enter password", args->user);
 
-	char passwd1[32];
+	char passwd1[sizeof(args->password)];
 	yoauth_tui_passwd("enter password: ", passwd1, sizeof(passwd1));
 	YOAUTH_OUTPUT("")
 
-	char passwd2[32];
+	char passwd2[sizeof(args->password)];
 	yoauth_tui_passwd("enter password again: ", passwd2, sizeof(passwd2));
 	YOAUTH_OUTPUT("");
 
@@ -71,8 +84,10 @@ bool yoauth_create_user(const char *username)
 		return false;
 	}
 
+	memcpy(args->password, passwd1, sizeof(args->password));
+
 	char filepath[MUGGLE_MAX_PATH];
-	if (!yoauth_path_user_file(username, filepath, sizeof(filepath))) {
+	if (!yoauth_path_user_file(args->user, filepath, sizeof(filepath))) {
 		YOAUTH_ERROR("failed get user data path");
 		return false;
 	}
@@ -95,24 +110,29 @@ bool yoauth_create_user(const char *username)
 
 void yoauth_scenes_main(yoauth_handle_t *handle, yoauth_tui_t *tui)
 {
+	MUGGLE_UNUSED(tui);
+
 	yoauth_tui_move_to(0, 0);
 
 	// page head
 	YOAUTH_STYLE_TIP;
-	fprintf(stdout, "a: ");
-	YOAUTH_STYLE_NORMAL;
-	fprintf(stdout, "add account & secret key;    ");
-	YOAUTH_STYLE_TIP;
-	fprintf(stdout, "d: ");
-	YOAUTH_STYLE_NORMAL;
-	fprintf(stdout, "delete account & secret key;    ");
-	YOAUTH_STYLE_TIP;
-	fprintf(stdout, "q: ");
+	fprintf(stdout, "press enter: ");
 	YOAUTH_STYLE_NORMAL;
 	fprintf(stdout, "exit");
 	YOAUTH_OUTPUT("");
 	YOAUTH_OUTPUT_SPLIT_LINE;
 
-	// TODO: testxxx
+	time_t ts = time(NULL);
+	size_t cnt = muggle_array_list_size(handle->datas);
+	for (size_t i = 0; i < cnt; i++) {
+		muggle_array_list_node_t *node =
+			muggle_array_list_index(handle->datas, i);
+		yoauth_totp_data_t *data = (yoauth_totp_data_t *)node->data;
+		int32_t code = yoauth_totp_at(data, ts);
+		char v[16];
+		snprintf(v, sizeof(v), "%d", code);
+		YOAUTH_OUTPUT_KV(data->account, v, sizeof(data->account) + 2);
+	}
+
 	getchar();
 }

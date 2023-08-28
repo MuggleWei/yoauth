@@ -16,4 +16,6 @@
 #include "yoauth/core/crypt.h"
 #include "yoauth/core/fileutils.h"
 
+#include "yoauth/core/external/base32.h"
+
 #endif // !YOAUTH_CORE_CORE_H_

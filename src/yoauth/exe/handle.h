@@ -42,6 +42,37 @@ bool yoauth_handle_init(yoauth_handle_t *handle, const char *username,
  */
 void yoauth_handle_destroy(yoauth_handle_t *handle);
 
+/**
+ * @brief add account
+ *
+ * @param handle     handle pointer
+ * @param account    new account
+ * @param secret     secret key
+ *
+ * @return boolean value
+ */
+bool yoauth_handle_add(yoauth_handle_t *handle, const char *account,
+					   const char *secret);
+
+/**
+ * @brief delete account
+ *
+ * @param handle     handle pointer
+ * @param account    secret key
+ *
+ * @return boolean value
+ */
+bool yoauth_handle_del(yoauth_handle_t *handle, const char *account);
+
+/**
+ * @brief dump to file
+ *
+ * @param handle  handle pointer
+ *
+ * @return 
+ */
+bool yoauth_handle_dumps(yoauth_handle_t *handle);
+
 EXTERN_C_END
 
 #endif // !YOAUTH_EXE_HANDLE_H_
