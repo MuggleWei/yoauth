@@ -21,6 +21,7 @@ typedef struct sys_args {
 	char add_account[16];
 	char del_account[16];
 	char secret[16];
+	int keylen;
 } sys_args_t;
 
 /**

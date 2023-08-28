@@ -48,11 +48,12 @@ void yoauth_handle_destroy(yoauth_handle_t *handle);
  * @param handle     handle pointer
  * @param account    new account
  * @param secret     secret key
+ * @param keylen     length of key
  *
  * @return boolean value
  */
 bool yoauth_handle_add(yoauth_handle_t *handle, const char *account,
-					   const char *secret);
+					   const char *secret, int keylen);
 
 /**
  * @brief delete account
