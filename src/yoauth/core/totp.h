@@ -42,7 +42,7 @@ typedef struct yoauth_totp_data {
  * @return  TOTP object pointer
  */
 YOAUTH_EXPORT
-yoauth_totp_data_t *yoauth_totp_init(const char *k, uint32_t klen,
+yoauth_totp_data_t *yoauth_totp_init(const unsigned char *k, uint32_t klen,
 									 const char *crypto);
 
 /**

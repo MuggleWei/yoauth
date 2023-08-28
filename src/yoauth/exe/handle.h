@@ -53,7 +53,7 @@ void yoauth_handle_destroy(yoauth_handle_t *handle);
  * @return boolean value
  */
 bool yoauth_handle_add(yoauth_handle_t *handle, const char *account,
-					   const char *secret, int keylen);
+					   const unsigned char *secret, int keylen);
 
 /**
  * @brief delete account
