@@ -53,6 +53,10 @@ bool yoauth_fileutils_store_totp(const char *filepath, const char *password,
 		ciphertext = NULL;
 	}
 
+#if MUGGLE_PLATFORM_WINDOWS
+	muggle_os_remove(filepath);
+#endif
+
 	if (muggle_os_rename(tmp_path, filepath) != 0) {
 		LOG_ERROR("failed rename file");
 		goto err_store;
