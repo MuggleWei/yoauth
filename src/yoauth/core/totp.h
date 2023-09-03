@@ -16,15 +16,23 @@
 
 EXTERN_C_BEGIN
 
+#define YOAUTH_TOTP_ACCOUNT_SIZE 64
+
+// accord to RFC 6238
+// Seed for HMAC-SHA1 - 20 bytes
+// Seed for HMAC-SHA256 - 32 bytes
+// Seed for HMAC-SHA512 - 64 bytes
 #define YOAUTH_TOTP_KEY_SIZE 64
+
+#define YOAUTH_TOTP_ALGO_SIZE 16
 #define YOAUTH_TOTP_DEFAULT_TIME_STEP 30
 
 #pragma pack(push, 8)
 
 typedef struct yoauth_totp_data {
-	char account[16]; //!< account
+	char account[YOAUTH_TOTP_ACCOUNT_SIZE]; //!< account
 	char key[YOAUTH_TOTP_KEY_SIZE]; //!< secret key
-	char algo[16]; //!< crypto function to use
+	char algo[YOAUTH_TOTP_ALGO_SIZE]; //!< crypto function to use
 	uint32_t keylen; //!< length of secret key
 	uint32_t return_digits; //!< number of digits to return
 	uint64_t time_step; //!< TOTP time step in seconds
