@@ -28,6 +28,7 @@ static bool yoauth_parse_args_command_dump(int argc, char **argv,
 	static struct option long_options[] = {
 		{ "user", required_argument, NULL, 'u' },
 		{ "output", required_argument, NULL, 'o' },
+		{ "help", required_argument, NULL, 'h' },
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -36,7 +37,7 @@ static bool yoauth_parse_args_command_dump(int argc, char **argv,
 	while (true) {
 		int c = 0;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "u:o:", long_options, &option_index);
+		c = getopt_long(argc, argv, "u:o:h", long_options, &option_index);
 		if (c == -1) {
 			break;
 		}
@@ -59,6 +60,10 @@ static bool yoauth_parse_args_command_dump(int argc, char **argv,
 				return false;
 			}
 			strncpy(args->output, optarg, sizeof(args->output) - 1);
+		} break;
+		case 'h': {
+			yoauth_usage_command_dump();
+			exit(EXIT_SUCCESS);
 		} break;
 		}
 	}
