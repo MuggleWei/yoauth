@@ -131,6 +131,7 @@ if [ $build_openssl -eq 1 ]; then
 	$openssl_src_dir/Configure \
 		--prefix=$install_dir \
 		--openssldir=$install_dir \
+		--libdir=lib \
 		threads \
 		no-comp \
 		-Wl,-rpath,\\\$\$ORIGIN/../lib \
