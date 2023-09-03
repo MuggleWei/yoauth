@@ -3,6 +3,7 @@
 #include "command_add.h"
 #include "command_del.h"
 #include "command_dump.h"
+#include "command_load.h"
 
 #define STR_USAGE                                      \
 	"Commands:\n"                                      \
@@ -25,6 +26,7 @@ void yoauth_show_usage(const char *argv0)
 	yoauth_usage_command_add();
 	yoauth_usage_command_del();
 	yoauth_usage_command_dump();
+	yoauth_usage_command_load();
 }
 
 int main(int argc, char *argv[])
@@ -52,7 +54,7 @@ int main(int argc, char *argv[])
 	} else if (strcmp(command, "dump") == 0) {
 		yoauth_run_command_dump(cmd_argc, cmd_argv);
 	} else if (strcmp(command, "load") == 0) {
-		YOAUTH_OUTPUT("load");
+		yoauth_run_command_load(cmd_argc, cmd_argv);
 	} else {
 		if (strcmp(command, "-h") == 0 || strcmp(command, "--help") == 0) {
 			yoauth_show_usage(argv[0]);

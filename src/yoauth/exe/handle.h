@@ -91,6 +91,16 @@ bool yoauth_handle_store(yoauth_handle_t *handle);
  */
 bool yoauth_handle_dump(yoauth_handle_t *handle, const char *filepath);
 
+/**
+ * @brief load from file
+ *
+ * @param handle    handle pointer
+ * @param filepath  filepath
+ *
+ * @return 
+ */
+bool yoauth_handle_load_csv(yoauth_handle_t *handle, const char *filepath);
+
 EXTERN_C_END
 
 #endif // !YOAUTH_EXE_HANDLE_H_

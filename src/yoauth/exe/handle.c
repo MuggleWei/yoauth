@@ -404,3 +404,91 @@ bool yoauth_handle_dump(yoauth_handle_t *handle, const char *filepath)
 
 	return true;
 }
+
+bool yoauth_handle_load_csv(yoauth_handle_t *handle, const char *filepath)
+{
+	bool ret = true;
+
+	FILE *fp = NULL;
+	char *bytes = NULL;
+
+	fp = fopen(filepath, "rb");
+	if (fp == NULL) {
+		YOAUTH_ERROR("failed open %s for read", filepath);
+		ret = false;
+		goto load_exit;
+	}
+
+	fseek(fp, 0, SEEK_END);
+	long numbytes = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	if (numbytes == 0) {
+		ret = true;
+		goto load_exit;
+	}
+
+	bytes = (char *)malloc(numbytes + 1);
+	if (bytes == NULL) {
+		return false;
+	}
+
+	fread(bytes, 1, numbytes, fp);
+	bytes[numbytes] = '\0';
+
+	char *p = bytes;
+	char *k = NULL;
+	char *v = NULL;
+	while (true) {
+		k = p;
+		while (*p != ',' && *p != '\0') {
+			p++;
+		}
+
+		if (*p == '\0') {
+			break;
+		}
+
+		*p = '\0';
+		p++;
+
+		v = p;
+		while (*p != '\0' && *p != '\n') {
+			p++;
+		}
+
+		if (*p == '\n') {
+			*p = '\0';
+			if (!yoauth_handle_add(handle, k, (unsigned char *)v)) {
+				YOAUTH_ERROR("success add account '%s'", k);
+				ret = false;
+				break;
+			} else {
+				YOAUTH_OUTPUT_KV(k, v, 32);
+			}
+			p++;
+		} else {
+			if (!yoauth_handle_add(handle, k, (unsigned char *)v)) {
+				YOAUTH_ERROR("failed add account '%s'", k);
+				ret = false;
+				break;
+			} else {
+				YOAUTH_OUTPUT("success add account '%s'", k);
+			}
+			break;
+		}
+	}
+
+load_exit:
+	if (bytes) {
+		free(bytes);
+		bytes = NULL;
+	}
+
+	if (fp) {
+		fclose(fp);
+		fp = NULL;
+	}
+
+	return ret;
+}
