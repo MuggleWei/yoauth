@@ -17,10 +17,9 @@ static void yoauth_handle_passwd(const char *tip, char *buf, size_t bufsize)
 	const char ENTER = 13;
 	int i = 0;
 	int c = 0;
-	while((c = _getch()) != ENTER && c != EOF && i < (int)bufsize - 1)
-    {
-        buf[i++] = c;
-    }
+	while ((c = _getch()) != ENTER && c != EOF && i < (int)bufsize - 1) {
+		buf[i++] = c;
+	}
 	buf[i] = '\0';
 }
 #else
@@ -358,12 +357,12 @@ dumps_exit:
 bool yoauth_handle_dump(yoauth_handle_t *handle, const char *filepath)
 {
 	char dirname[MUGGLE_MAX_PATH];
-	if (!muggle_path_dirname(filepath, dirname, sizeof(dirname))) {
+	if (muggle_path_dirname(filepath, dirname, sizeof(dirname)) != 0) {
 		YOAUTH_ERROR("failed get dirname of %s", filepath);
 		return false;
 	}
 	if (!muggle_path_exists(dirname)) {
-		if (!muggle_os_mkdir(dirname)) {
+		if (muggle_os_mkdir(dirname) != 0) {
 			YOAUTH_ERROR("failed mkdir %s", dirname);
 			return false;
 		}
@@ -371,20 +370,37 @@ bool yoauth_handle_dump(yoauth_handle_t *handle, const char *filepath)
 
 	FILE *fp = NULL;
 	fp = fopen(filepath, "wb");
+	if (fp == NULL) {
+		YOAUTH_ERROR("failed open %s for write", filepath);
+		return false;
+	}
 
 	size_t cnt = muggle_array_list_size(handle->datas);
 	for (size_t i = 0; i < cnt; i++) {
 		muggle_array_list_node_t *node =
 			muggle_array_list_index(handle->datas, i);
 		yoauth_totp_data_t *data = (yoauth_totp_data_t *)node->data;
-		char key[YOAUTH_TOTP_KEY_SIZE + 1];
+		char key[YOAUTH_TOTP_KEY_SIZE * 4 + 1];
 		memset(key, 0, sizeof(key));
-		memcpy(key, data->key, data->keylen);
+		if (base32_encode((unsigned char *)data->key, data->keylen,
+						  (unsigned char *)key, sizeof(key)) == -1) {
+			YOAUTH_ERROR("failed base32 encode key for account['%s']",
+						 data->account);
+			fclose(fp);
+			return false;
+		}
+
+		fwrite(data->account, 1, strlen(data->account), fp);
+		fwrite(",", 1, 1, fp);
+		fwrite(key, 1, strlen(key), fp);
+		fwrite("\n", 1, 1, fp);
 	}
 
 	if (fp) {
 		fclose(fp);
 	}
+
+	YOAUTH_OUTPUT("success dump to: %s", filepath);
 
 	return true;
 }

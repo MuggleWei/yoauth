@@ -87,7 +87,11 @@ void yoauth_run_command_dump(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	// TODO:
+	if (!yoauth_handle_dump(&handle, args.output)) {
+		YOAUTH_ERROR("failed dump to '%s'", args.output);
+		yoauth_handle_destroy(&handle);
+		exit(EXIT_FAILURE);
+	}
 
 	yoauth_handle_destroy(&handle);
 }

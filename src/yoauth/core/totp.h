@@ -17,7 +17,13 @@
 EXTERN_C_BEGIN
 
 #define YOAUTH_TOTP_ACCOUNT_SIZE 16
+
+// accord to RFC 6238
+// Seed for HMAC-SHA1 - 20 bytes
+// Seed for HMAC-SHA256 - 32 bytes
+// Seed for HMAC-SHA512 - 64 bytes
 #define YOAUTH_TOTP_KEY_SIZE 64
+
 #define YOAUTH_TOTP_ALGO_SIZE 16
 #define YOAUTH_TOTP_DEFAULT_TIME_STEP 30
 
