@@ -24,7 +24,7 @@
 ## 下载/编译
 
 ### 下载
-可以直接从此项目的 [Release](https://github.com/MuggleWei/yoauth/releases) 下载对应的包，加压并直接使用
+可以直接从此项目的 [Release](https://github.com/MuggleWei/yoauth/releases) 下载对应的包，解压并直接使用
 
 ### 从源码编译
 用户也可以不使用打好的包，直接从源码进行编译，这里有多种可选择的方案
