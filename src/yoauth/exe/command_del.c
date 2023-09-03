@@ -13,7 +13,7 @@ void yoauth_usage_command_del()
 
 	YOAUTH_OUTPUT("");
 	YOAUTH_TIP("e.g.");
-	YOAUTH_OUTPUT_KV("yoauth delete -d github",
+	YOAUTH_OUTPUT_KV("yoauth delete -a github",
 					 "//!< delte account 'github'", 40);
 }
 
