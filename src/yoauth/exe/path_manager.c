@@ -1,6 +1,6 @@
 #include "path_manager.h"
 #include "muggle/c/muggle_c.h"
-#include "tui.h"
+#include "style.h"
 
 bool yoauth_path_root_dir(char *buf, size_t bufsize)
 {
