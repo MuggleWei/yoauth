@@ -49,7 +49,7 @@ sudo pacman -S openssl
 **注意**: 当开启了编译 `openssl` 的选项，那么编译步骤将耗费较多的时间，好处是可以打出一个 `portable` 安装包，确保了在相同系统中可以直接拷贝使用
 
 #### 编译
-运行项目根目录中的 `build.sh`，运行结束后，将在根目录中生成 `dist/yoauth.tar.gz`  
+确保 CMake 和 git 都已经安装，运行项目根目录中的 `build.sh`，运行结束后，将在根目录中生成 `dist/yoauth.tar.gz`  
 
 ## 使用
 将下载/编译好的包解压到任何你想要的位置，比如: `./local/app/yoauth`，运行其 `bin` 目录中 `yoauth -h`，将看到使用帮助  
