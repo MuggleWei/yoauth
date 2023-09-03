@@ -47,7 +47,7 @@ EXTERN_C_BEGIN
 		GetConsoleScreenBufferInfo(stdout_handle, &sb_info);          \
 		const WORD old_sb_attrs = sb_info.wAttributes;
 
-	#define YOAUTH_WINDOWS_RESET_LOAD_STYLE \
+	#define YOAUTH_WINDOWS_RESET_STYLE \
 		SetConsoleTextAttribute(stdout_handle, old_sb_attrs);
 
 	#define YOAUTH_STYLE_ERROR                 \
