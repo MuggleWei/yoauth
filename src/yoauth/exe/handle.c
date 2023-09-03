@@ -21,6 +21,8 @@ static void yoauth_handle_passwd(const char *tip, char *buf, size_t bufsize)
 		buf[i++] = c;
 	}
 	buf[i] = '\0';
+
+	YOAUTH_OUTPUT("");
 }
 #else
 static void yoauth_handle_passwd(const char *tip, char *buf, size_t bufsize)
