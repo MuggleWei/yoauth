@@ -18,6 +18,9 @@
 ## 概述
 **YoAuth** 是一个本地的，纯命令行终端下的 TOTP generator，可用于诸如 github, google 或者 microsoft 账户的 2FA 验证
 
+* [readme EN](./readme.md)
+* [readme 中文](./readme_cn.md)
+
 ## 下载/编译
 
 ### 下载
