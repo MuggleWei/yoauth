@@ -14,7 +14,7 @@ void yoauth_usage_command_add()
 
 	YOAUTH_OUTPUT("");
 	YOAUTH_TIP("e.g.");
-	YOAUTH_OUTPUT_KV("yoauth -a github -k NBSWY3DPO5XXE3DE",
+	YOAUTH_OUTPUT_KV("yoauth add -a github -k NBSWY3DPO5XXE3DE",
 					 "//!< save secret key for account 'github'", 40);
 }
 
