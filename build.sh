@@ -160,5 +160,5 @@ cmake --build $build_dir --target install
 
 # package
 cd $install_dir
-tar -czvf yoauth.tar.gz bin lib/*.so*
+tar -czvf yoauth.tar.gz bin/yoauth* lib/*.so*
 mv yoauth.tar.gz $pkg_dir
