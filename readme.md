@@ -1,37 +1,40 @@
 - [YoAuth](#yoauth)
-  - [概述](#概述)
-  - [下载/编译](#下载编译)
-    - [下载](#下载)
-    - [从源码编译](#从源码编译)
-      - [安装 openssl](#安装-openssl)
-      - [编译](#编译)
-  - [使用](#使用)
-    - [第一次使用](#第一次使用)
-    - [添加账户和密钥](#添加账户和密钥)
-    - [删除账户](#删除账户)
-    - [查看验证码](#查看验证码)
-  - [备份/迁移](#备份迁移)
-    - [备份 data 文件](#备份-data-文件)
+  - [Overview](#overview)
+  - [Download/Compile](#downloadcompile)
+    - [Download](#download)
+    - [Compile From Source Code](#compile-from-source-code)
+      - [Install OpenSSL](#install-openssl)
+      - [Compile](#compile)
+    - [First Use](#first-use)
+    - [Add Account And Key](#add-account-and-key)
+    - [Delete Account](#delete-account)
+    - [View Verification Code](#view-verification-code)
+  - [Backup/Migration](#backupmigration)
+    - [Backup Data Files](#backup-data-files)
     - [Dump](#dump)
 
+
 # YoAuth
-## 概述
-**YoAuth** 是一个本地的，纯命令行终端下的 TOTP generator，可用于诸如 github, google 或者 microsoft 账户的 2FA 验证
+## Overview
+**YoAuth** is a local, pure terminal command line TOTP generator, used for 2FA verification of accounts such as github, google or microsoft  
 
-## 下载/编译
+* [readme EN](./readme.md)
+* [readme 中文](./readme_cn.md)
 
-### 下载
-可以直接从此项目的 [Release](https://github.com/MuggleWei/yoauth/releases) 下载对应的包，加压并直接使用
+## Download/Compile
 
-### 从源码编译
-用户也可以不使用打好的包，直接从源码进行编译，这里有多种可选择的方案
-* 直接使用项目中的脚本编译
-* 使用 C 包管理系统下载依赖项并编译
+### Download
+You can directly download the corresponding package from [Release](https://github.com/MuggleWei/yoauth/releases) of this project, depressed and use it directly  
 
-简单起见，为了不熟悉 C 包管理的用户也可以轻松编译，这里仅介绍直接使用使用项目中脚本进行编译的方式
+### Compile From Source Code
+Users can also compile from the source code without download package. There are many options to choose
+* Directly use the script compilation in the project
+* Use the C package management system to download dependencies and compile
 
-#### 安装 openssl
-可以选择使用系统包管理安装，也可以选择编译 `openssl` 源码
+For the sake of simplicity, users who are not familiar with C package management can also easily to compile, here only introduces the way of directly using build script in project  
+
+#### Install OpenSSL
+User can choose to use system package management to install, or compile `openssl` source code
 
 * ubuntu
 ```
@@ -43,47 +46,42 @@ sudo apt install openssl libssl-dev
 sudo pacman -S openssl
 ```
 
-* 编译 openssl
-如果不想使用系统包管理，也可以选择直接从源码编译 `openssl`，修改项目根目录中的 `build.sh`, 在其中找到 `build_openssl=0` 并将其改为 `build_openssl=1`，这样在进行编译的时候会自动下载并编译 `openssl`;  
+* compile openssl
+If don’t wanna use system package management, can also choose to compile `openssl` directly from the source code, modify `build.sh` in the project root directory, find `build_openssl=0` and change it to `build_openssl=1`, after modify, `openssl` will be automatically downloaded and compiled in build time
 
-**注意**: 当开启了编译 `openssl` 的选项，那么编译步骤将耗费较多的时间，好处是可以打出一个 `portable` 安装包，确保了在相同系统中可以直接拷贝使用
+#### Compile
+Make sure both CMake and git are installed, run `build.sh` in the root directory of the project, after running, `dist/yoauth.tar.gz` will be generated in the root directory
 
-#### 编译
-确保 CMake 和 git 都已经安装，运行项目根目录中的 `build.sh`，运行结束后，将在根目录中生成 `dist/yoauth.tar.gz`  
+### First Use
+For the first use, run the `yoauth` command directly, you will be prompted to enter the password twice, and an encrypted file storing the TOTP key will be generated locally. When no other options are entered, the default folder name will be used. Because all content of **YoAuth** is stored locally, please be sure to remember the password you entered, once lost, it will not be retrieved  
 
-## 使用
-将下载/编译好的包解压到任何你想要的位置，比如: `./local/app/yoauth`，运行其 `bin` 目录中 `yoauth -h`，将看到使用帮助  
-
-### 第一次使用
-第一次使用，可以直接运行 `yoauth` 命令，会提示你输入两次密码，在本地生成一个加密的存储 TOTP 密钥的文件，当没用输入其他选项时，会使用默认的文件夹名称。因为 **YoAuth** 的所有内容均为本地存储，请务必记住输入的密码，一旦丢失，将无法找回  
-
-### 添加账户和密钥
-例如，当前需要添加 `github` 的 2FA 验证，假设密钥为: `NBSWY3DPO5XXE3DE`
+### Add Account And Key
+For example, the 2FA verification of `github` needs to be added currently, assuming the key is: `NBSWY3DPO5XXE3DE`
 ```
 yoauth add -a github -k NBSWY3DPO5XXE3DE
 ```
 
-### 删除账户
-例如，当前需要删除 `github` 的账户密钥
+### Delete Account
+For example, currently you need to delete the account key of `github`
 ```
 yoauth delete -a github
 ```
 
-### 查看验证码
-需要列出所有验证码，直接运行 `yoauth` 即可  
-当需要对账户进行筛选时，可以使用 `list` 命令，例如当前想要筛选得到账户中包含 `google` 字符串的验证码
+### View Verification Code
+All verification codes need to be listed, just run `yoauth` directly  
+When you need to filter accounts, you can use the `list` command. For example, you currently want to filter out the verification codes that contain the `google` string in the account.
 ```
 yoauth list -f google
 ```
 
-## 备份/迁移
-当需要将密钥备份/迁移有两种方法
+## Backup/Migration
+When you need to back up/migrate keys, there are two methods:
 
-### 备份 data 文件
-默认情况下，存储密钥的文件就在用户所解压目录的 `data` 文件夹中，用户可以直接拷贝到其他地方进行备份
+### Backup Data Files
+By default, the file storing the key is in the `data` folder of the user's decompressed directory, and the user can directly copy it to other places for backup
 
 ### Dump
-用户也可以将所有密钥导出成明文形式进行迁移
+Users can also export all keys into plaintext for migration
 ```
 yoauth dump -o ./backup.txt
 ```
