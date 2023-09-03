@@ -13,8 +13,8 @@ void yoauth_usage_command_del()
 
 	YOAUTH_OUTPUT("");
 	YOAUTH_TIP("e.g.");
-	YOAUTH_OUTPUT_KV("yoauth delete -d github",
-					 "//!< delte account 'github'", 40);
+	YOAUTH_OUTPUT_KV("yoauth delete -a github", "//!< delte account 'github'",
+					 40);
 }
 
 typedef struct cmd_del_args {
@@ -28,6 +28,7 @@ static bool yoauth_parse_args_command_del(int argc, char **argv,
 	static struct option long_options[] = {
 		{ "user", required_argument, NULL, 'u' },
 		{ "account", required_argument, NULL, 'a' },
+		{ "help", required_argument, NULL, 'h' },
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -36,7 +37,7 @@ static bool yoauth_parse_args_command_del(int argc, char **argv,
 	while (true) {
 		int c = 0;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "u:a:", long_options, &option_index);
+		c = getopt_long(argc, argv, "u:a:h", long_options, &option_index);
 		if (c == -1) {
 			break;
 		}
@@ -59,6 +60,10 @@ static bool yoauth_parse_args_command_del(int argc, char **argv,
 				return false;
 			}
 			strncpy(args->account, optarg, sizeof(args->account) - 1);
+		} break;
+		case 'h': {
+			yoauth_usage_command_del();
+			exit(EXIT_SUCCESS);
 		} break;
 		}
 	}

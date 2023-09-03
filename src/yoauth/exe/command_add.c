@@ -15,7 +15,7 @@ void yoauth_usage_command_add()
 	YOAUTH_OUTPUT("");
 	YOAUTH_TIP("e.g.");
 	YOAUTH_OUTPUT_KV("yoauth add -a github -k NBSWY3DPO5XXE3DE",
-					 "//!< save secret key for account 'github'", 40);
+					 "//!< save secret key for account 'github'", 43);
 }
 
 typedef struct cmd_add_args {
@@ -31,6 +31,7 @@ static bool yoauth_parse_args_command_add(int argc, char **argv,
 		{ "user", required_argument, NULL, 'u' },
 		{ "account", required_argument, NULL, 'a' },
 		{ "key", required_argument, NULL, 'k' },
+		{ "help", required_argument, NULL, 'h' },
 		{ NULL, 0, NULL, 0 }
 	};
 
@@ -39,7 +40,7 @@ static bool yoauth_parse_args_command_add(int argc, char **argv,
 	while (true) {
 		int c = 0;
 		int option_index = 0;
-		c = getopt_long(argc, argv, "u:a:k:", long_options, &option_index);
+		c = getopt_long(argc, argv, "u:a:k:h", long_options, &option_index);
 		if (c == -1) {
 			break;
 		}
@@ -71,6 +72,10 @@ static bool yoauth_parse_args_command_add(int argc, char **argv,
 				return false;
 			}
 			strncpy(args->key, optarg, sizeof(args->key) - 1);
+		} break;
+		case 'h': {
+			yoauth_usage_command_add();
+			exit(EXIT_SUCCESS);
 		} break;
 		}
 	}
