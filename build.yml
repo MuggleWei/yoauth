@@ -1,6 +1,6 @@
 name: yoauth
 variables:
-  - build_type: debug
+  - build_type: release
   - yoauth_tag: v1.0.0
   - mugglec_tag: v1.3.2
   - openssl_tag: openssl-3.1.1
@@ -32,8 +32,8 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=${HPB_OUTPUT_DIR} \
             -DBUILD_TESTING=OFF \
             -DCMAKE_PREFIX_PATH="${HPB_DEPS_DIR};${HPB_TEST_DEPS_DIR}";
-          cmake --build ${HPB_BUILD_DIR};
-          cmake --build ${HPB_BUILD_DIR} --target install;
+          cmake --build ${HPB_BUILD_DIR} --config ${build_type};
+          cmake --build ${HPB_BUILD_DIR} --config ${build_type} --target install;
   package:
     steps:
       - name: package
