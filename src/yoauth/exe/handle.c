@@ -3,11 +3,26 @@
 #include "style.h"
 
 #if MUGGLE_PLATFORM_WINDOWS
+	#include <conio.h>
 #else
 	#include <termios.h>
 #endif
 
 #if MUGGLE_PLATFORM_WINDOWS
+static void yoauth_handle_passwd(const char *tip, char *buf, size_t bufsize)
+{
+	fprintf(stdout, "%s", tip);
+	fflush(stdout);
+
+	const char ENTER = 13;
+	int i = 0;
+	int c = 0;
+	while((c = _getch()) != ENTER && c != EOF && i < (int)bufsize - 1)
+    {
+        buf[i++] = c;
+    }
+	buf[i] = '\0';
+}
 #else
 static void yoauth_handle_passwd(const char *tip, char *buf, size_t bufsize)
 {
