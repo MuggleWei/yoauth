@@ -128,7 +128,7 @@ if [ $build_openssl -eq 1 ]; then
 	fi
 	cd $openssl_build_dir
 
-	$openssl_src_dir/configure \
+	$openssl_src_dir/Configure \
 		--prefix=$install_dir \
 		--openssldir=$install_dir \
 		threads \
