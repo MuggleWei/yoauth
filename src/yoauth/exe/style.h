@@ -33,7 +33,7 @@ EXTERN_C_BEGIN
 		fprintf(stdout, "\n");         \
 	} while (0)
 
-#define YOAUTH_OUTPUT_COMMAND_DESC(k, v) YOAUTH_OUTPUT_KV(k, v, 42)
+#define YOAUTH_OUTPUT_COMMAND_DESC(k, v) YOAUTH_OUTPUT_KV(k, v, 20)
 
 #define YOAUTH_OUTPUT(format, ...)                   \
 	do {                                             \
@@ -143,7 +143,7 @@ EXTERN_C_BEGIN
 			while (--num_blank > 0) {         \
 				fprintf(stdout, " ");         \
 			}                                 \
-			fprintf(stdout, s "\n");          \
+			fprintf(stdout, "%s\n", s);       \
 			YOAUTH_OUTPUT_SPLIT_LINE;         \
 			YOAUTH_STYLE_NORMAL;              \
 		} while (0)
