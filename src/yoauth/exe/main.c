@@ -1,14 +1,15 @@
 #include "style.h"
 #include "command_list.h"
 #include "command_add.h"
-#include "yoauth/exe/command_del.h"
+#include "command_del.h"
+#include "command_dump.h"
 
 #define STR_USAGE                                      \
 	"Commands:\n"                                      \
 	"  list          list TOTP codes\n"                \
 	"  add           add new account\n"                \
 	"  delete        delete account\n"                 \
-	"  dumps         dumps account and key to file\n"  \
+	"  dump          dump account and key to file\n"   \
 	"  load          load account and key from file\n" \
 	"  -h, --help    show usage information\n"         \
 	"  -v, --version show version\n"                   \
@@ -23,6 +24,7 @@ void yoauth_show_usage(const char *argv0)
 	yoauth_usage_command_list();
 	yoauth_usage_command_add();
 	yoauth_usage_command_del();
+	yoauth_usage_command_dump();
 }
 
 int main(int argc, char *argv[])
@@ -47,8 +49,8 @@ int main(int argc, char *argv[])
 		yoauth_run_command_add(cmd_argc, cmd_argv);
 	} else if (strcmp(command, "delete") == 0) {
 		yoauth_run_command_del(cmd_argc, cmd_argv);
-	} else if (strcmp(command, "dumps") == 0) {
-		YOAUTH_OUTPUT("dumps");
+	} else if (strcmp(command, "dump") == 0) {
+		yoauth_run_command_dump(cmd_argc, cmd_argv);
 	} else if (strcmp(command, "load") == 0) {
 		YOAUTH_OUTPUT("load");
 	} else {

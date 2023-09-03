@@ -55,13 +55,12 @@ void yoauth_handle_list(yoauth_handle_t *handle, const char *filter);
  *
  * @param handle     handle pointer
  * @param account    new account
- * @param secret     secret key
- * @param keylen     length of key
+ * @param secret     secret key in base32 format
  *
  * @return boolean value
  */
 bool yoauth_handle_add(yoauth_handle_t *handle, const char *account,
-					   const unsigned char *secret, int keylen);
+					   const unsigned char *secret);
 
 /**
  * @brief delete account
@@ -81,6 +80,16 @@ bool yoauth_handle_del(yoauth_handle_t *handle, const char *account);
  * @return 
  */
 bool yoauth_handle_store(yoauth_handle_t *handle);
+
+/**
+ * @brief dump to file
+ *
+ * @param handle    handle pointer
+ * @param filepath  filepath
+ *
+ * @return 
+ */
+bool yoauth_handle_dump(yoauth_handle_t *handle, const char *filepath);
 
 EXTERN_C_END
 

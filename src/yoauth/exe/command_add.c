@@ -21,7 +21,7 @@ void yoauth_usage_command_add()
 typedef struct cmd_add_args {
 	char user[64];
 	char account[YOAUTH_TOTP_ACCOUNT_SIZE];
-	char key[YOAUTH_TOTP_KEY_SIZE];
+	char key[256];
 } cmd_add_args_t;
 
 static bool yoauth_parse_args_command_add(int argc, char **argv,
@@ -103,8 +103,7 @@ void yoauth_run_command_add(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (!yoauth_handle_add(&handle, args.account, (unsigned char *)args.key,
-						   strlen(args.key))) {
+	if (!yoauth_handle_add(&handle, args.account, (unsigned char *)args.key)) {
 		YOAUTH_ERROR("failed add account '%s'", args.account);
 		yoauth_handle_destroy(&handle);
 		exit(EXIT_FAILURE);

@@ -234,9 +234,19 @@ static int cmp_totp_data(const void *d1, const void *d2)
 }
 
 bool yoauth_handle_add(yoauth_handle_t *handle, const char *account,
-					   const unsigned char *secret, int keylen)
+					   const unsigned char *secret)
 {
-	yoauth_totp_data_t *data = yoauth_totp_init(secret, keylen, NULL);
+	unsigned char k[YOAUTH_TOTP_KEY_SIZE];
+	int keylen = 0;
+
+	keylen =
+		base32_decode((unsigned char *)secret, (unsigned char *)k, sizeof(k));
+	if (keylen < 0) {
+		YOAUTH_ERROR("failed base32 decode");
+		return false;
+	}
+
+	yoauth_totp_data_t *data = yoauth_totp_init(k, keylen, NULL);
 	if (data == NULL) {
 		YOAUTH_ERROR("failed init totp data");
 		return false;
@@ -328,4 +338,38 @@ dumps_exit:
 	}
 
 	return ret;
+}
+
+bool yoauth_handle_dump(yoauth_handle_t *handle, const char *filepath)
+{
+	char dirname[MUGGLE_MAX_PATH];
+	if (!muggle_path_dirname(filepath, dirname, sizeof(dirname))) {
+		YOAUTH_ERROR("failed get dirname of %s", filepath);
+		return false;
+	}
+	if (!muggle_path_exists(dirname)) {
+		if (!muggle_os_mkdir(dirname)) {
+			YOAUTH_ERROR("failed mkdir %s", dirname);
+			return false;
+		}
+	}
+
+	FILE *fp = NULL;
+	fp = fopen(filepath, "wb");
+
+	size_t cnt = muggle_array_list_size(handle->datas);
+	for (size_t i = 0; i < cnt; i++) {
+		muggle_array_list_node_t *node =
+			muggle_array_list_index(handle->datas, i);
+		yoauth_totp_data_t *data = (yoauth_totp_data_t *)node->data;
+		char key[YOAUTH_TOTP_KEY_SIZE + 1];
+		memset(key, 0, sizeof(key));
+		memcpy(key, data->key, data->keylen);
+	}
+
+	if (fp) {
+		fclose(fp);
+	}
+
+	return true;
 }
