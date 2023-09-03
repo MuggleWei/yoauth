@@ -31,8 +31,12 @@
 #define _BASE32_H_
 
 #include <stdint.h>
+#include "yoauth/core/macro.h"
 
+YOAUTH_EXPORT
 int base32_decode(const uint8_t *encoded, uint8_t *result, int bufSize);
+
+YOAUTH_EXPORT
 int base32_encode(const uint8_t *data, int length, uint8_t *result,
 				  int bufSize);
 
