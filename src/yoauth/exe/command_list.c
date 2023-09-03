@@ -5,25 +5,23 @@
 void yoauth_usage_command_list()
 {
 	YOAUTH_OUTPUT_TITLE("Command: list");
-	YOAUTH_OUTPUT("list [OPTIONS]");
+	YOAUTH_TIP("list [OPTIONS]");
 	YOAUTH_OUTPUT_COMMAND_DESC("-f, --filter", "filter account");
 	YOAUTH_OUTPUT_COMMAND_DESC(
 		"-u, --user",
 		"specify user, without '-u', use 'default' user by default");
 
 	YOAUTH_OUTPUT("");
-	YOAUTH_OUTPUT("e.g.");
-	YOAUTH_OUTPUT_KV("yoauth -f google", "get 'google' TOTP code", 32);
-	YOAUTH_OUTPUT_KV("yoauth list -f google", "get 'google' TOTP code", 32);
-	YOAUTH_OUTPUT_KV("yoauth list -u foo -f google",
-					 "get 'google' TOTP code for user 'foo'", 32);
+	YOAUTH_TIP("e.g.");
+	YOAUTH_OUTPUT_KV("yoauth", "//!< list all TOTP code", 32);
+	YOAUTH_OUTPUT_KV("yoauth list -f google", "//!< get 'google' TOTP code", 32);
 
 	YOAUTH_OUTPUT("");
 }
 
 typedef struct cmd_list_args {
 	char user[64];
-	char filter[64];
+	char filter[YOAUTH_TOTP_ACCOUNT_SIZE];
 } cmd_list_args_t;
 
 static bool yoauth_parse_args_command_list(int argc, char **argv,
@@ -79,12 +77,12 @@ void yoauth_run_command_list(int argc, char **argv)
 	cmd_list_args_t args;
 	if (!yoauth_parse_args_command_list(argc, argv, &args)) {
 		YOAUTH_ERROR("failed parse arguments for command 'list'");
-		return;
+		exit(EXIT_FAILURE);
 	}
 
 	yoauth_handle_t handle;
 	if (!yoauth_handle_setup(&handle, args.user)) {
-		return;
+		exit(EXIT_FAILURE);
 	}
 
 	YOAUTH_OUTPUT_TITLE("TOTP codes");

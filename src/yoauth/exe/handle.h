@@ -74,13 +74,13 @@ bool yoauth_handle_add(yoauth_handle_t *handle, const char *account,
 bool yoauth_handle_del(yoauth_handle_t *handle, const char *account);
 
 /**
- * @brief dump to file
+ * @brief store to file
  *
  * @param handle  handle pointer
  *
  * @return 
  */
-bool yoauth_handle_dumps(yoauth_handle_t *handle);
+bool yoauth_handle_store(yoauth_handle_t *handle);
 
 EXTERN_C_END
 

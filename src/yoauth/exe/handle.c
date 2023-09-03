@@ -288,7 +288,7 @@ bool yoauth_handle_del(yoauth_handle_t *handle, const char *account)
 	return true;
 }
 
-bool yoauth_handle_dumps(yoauth_handle_t *handle)
+bool yoauth_handle_store(yoauth_handle_t *handle)
 {
 	bool ret = true;
 	unsigned char *plaintext = NULL;

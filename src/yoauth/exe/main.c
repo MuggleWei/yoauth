@@ -1,15 +1,13 @@
-#include "muggle/c/muggle_c.h"
-#include "path_manager.h"
 #include "style.h"
 #include "command_list.h"
+#include "command_add.h"
+#include "yoauth/exe/command_del.h"
 
 #define STR_USAGE                                      \
-	"Usage: %s [COMMAND] [OPTIONS]\n"                  \
-	"\n"                                               \
 	"Commands:\n"                                      \
 	"  list          list TOTP codes\n"                \
 	"  add           add new account\n"                \
-	"  remove        delete account\n"                 \
+	"  delete        delete account\n"                 \
 	"  dumps         dumps account and key to file\n"  \
 	"  load          load account and key from file\n" \
 	"  -h, --help    show usage information\n"         \
@@ -19,9 +17,12 @@
 void yoauth_show_usage(const char *argv0)
 {
 	YOAUTH_OUTPUT_TITLE("YoAuth " YOAUTH_VERSION);
-	YOAUTH_OUTPUT(STR_USAGE, argv0);
+	YOAUTH_TIP("Usage: %s [COMMAND] [OPTIONS]\n", argv0);
+	YOAUTH_OUTPUT(STR_USAGE);
 
 	yoauth_usage_command_list();
+	yoauth_usage_command_add();
+	yoauth_usage_command_del();
 }
 
 int main(int argc, char *argv[])
@@ -43,9 +44,9 @@ int main(int argc, char *argv[])
 	if (strcmp(command, "list") == 0) {
 		yoauth_run_command_list(cmd_argc, cmd_argv);
 	} else if (strcmp(command, "add") == 0) {
-		YOAUTH_OUTPUT("add");
-	} else if (strcmp(command, "remove") == 0) {
-		YOAUTH_OUTPUT("remove");
+		yoauth_run_command_add(cmd_argc, cmd_argv);
+	} else if (strcmp(command, "delete") == 0) {
+		yoauth_run_command_del(cmd_argc, cmd_argv);
 	} else if (strcmp(command, "dumps") == 0) {
 		YOAUTH_OUTPUT("dumps");
 	} else if (strcmp(command, "load") == 0) {
