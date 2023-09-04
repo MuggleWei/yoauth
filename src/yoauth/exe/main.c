@@ -24,12 +24,6 @@ void yoauth_show_usage(const char *argv0)
 
 	YOAUTH_TIP("Sub-Command Usage");
 	YOAUTH_OUTPUT("  %s [COMMAND] -h", argv0);
-
-	// yoauth_usage_command_list();
-	// yoauth_usage_command_add();
-	// yoauth_usage_command_del();
-	// yoauth_usage_command_dump();
-	// yoauth_usage_command_load();
 }
 
 int main(int argc, char *argv[])
