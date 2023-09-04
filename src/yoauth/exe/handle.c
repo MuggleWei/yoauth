@@ -221,6 +221,15 @@ void yoauth_handle_destroy(yoauth_handle_t *handle)
 	handle->datas = NULL;
 }
 
+static char *yoauth_handle_datetime(time_t ts, char *buf, size_t bufsize)
+{
+	struct tm t;
+	localtime_r(&ts, &t);
+	snprintf(buf, bufsize, "%d-%02d-%02dT%02d:%02d:%02d", t.tm_year + 1900,
+			 t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
+	return buf;
+}
+
 void yoauth_handle_list(yoauth_handle_t *handle, const char *filter)
 {
 	time_t ts = time(NULL);
@@ -240,6 +249,15 @@ void yoauth_handle_list(yoauth_handle_t *handle, const char *filter)
 
 		YOAUTH_OUTPUT_KV(data->account, v, 42);
 	}
+
+	time_t next_step_ts = ((time_t)(ts / 30 + 1) * 30);
+	char curr_tm[64];
+	yoauth_handle_datetime(ts, curr_tm, sizeof(curr_tm));
+
+	YOAUTH_OUTPUT_SPLIT_LINE;
+	time_t expired_sec = next_step_ts - ts;
+	YOAUTH_TIP("current: %s\nexpire after %llu seconds", curr_tm,
+			   (unsigned long long)expired_sec);
 }
 
 static int cmp_totp_data(const void *d1, const void *d2)
