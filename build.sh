@@ -166,6 +166,10 @@ cmake --build $build_dir --target install
 # package
 cd $install_dir
 if [[ "$OSTYPE" == "darwin"* ]]; then
+	# force change rpath to openssl in yoauth
+	if [ $build_openssl -eq 1 ]; then
+		install_name_tool -change "$install_dir/lib/libcrypto.3.dylib" @rpath/libcrypto.3.dylib bin/yoauth
+	fi
 	tar -czvf yoauth.tar.gz bin/yoauth* lib/*.dylib*
 else
 	tar -czvf yoauth.tar.gz bin/yoauth* lib/*.so*
