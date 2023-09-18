@@ -47,11 +47,13 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(BUILD_SHARED_LIBS "Build shared or static library" ON)
 option(BUILD_TESTING "Build unittest" OFF)
+option(BUILD_SANITIZER "Build with sanitizer" OFF)
 set(CMAKE_INSTALL_LIBDIR lib)
 
 # build flags
 message("# BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
 message("# BUILD_TESTING: ${BUILD_TESTING}")
+message("# BUILD_SANITIZER: ${BUILD_SANITIZER}")
 
 ################################
 # deps
@@ -150,6 +152,20 @@ set_target_properties(${yoauth_core} PROPERTIES
 	VERSION ${YOAUTH_VERSION}
 	SOVERSION ${YOAUTH_VERSION_MAJOR})
 
+if (BUILD_SANITIZER)
+	if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR
+		(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
+		target_compile_options(${yoauth_core} PUBLIC
+			-fsanitize=undefined
+			-fsanitize=address
+			-fsanitize=leak)
+		target_link_options(${yoauth_core} PUBLIC
+			-fsanitize=undefined
+			-fsanitize=address
+			-fsanitize=leak)
+	endif()
+endif()
+
 if (APPLE)
 	set_target_properties(${yoauth_core}
 		PROPERTIES
@@ -175,6 +191,20 @@ set_target_properties(${yoauth_exe} PROPERTIES
 	DEBUG_POSTFIX d
 	VERSION ${YOAUTH_VERSION}
 	SOVERSION ${YOAUTH_VERSION_MAJOR})
+
+if (BUILD_SANITIZER)
+	if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR
+		(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
+		target_compile_options(${yoauth_exe} PUBLIC
+			-fsanitize=undefined
+			-fsanitize=address
+			-fsanitize=leak)
+		target_link_options(${yoauth_exe} PUBLIC
+			-fsanitize=undefined
+			-fsanitize=address
+			-fsanitize=leak)
+	endif()
+endif()
 
 if (MSVC OR MINGW)
 	set_target_properties(${yoauth_exe}
