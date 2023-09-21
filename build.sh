@@ -15,7 +15,7 @@ origin_dir="$(dirname "$(readlink -f "$0")")"
 
 # build option
 build_mugglec=1
-build_openssl=0
+build_openssl=1
 
 # directories
 build_dir=$origin_dir/build
@@ -118,7 +118,7 @@ if [ $build_openssl -eq 1 ]; then
 	cd $dep_dir
 
 	openssl_git=https://github.com/openssl/openssl.git
-	openssl_tag=openssl-3.1.1
+	openssl_tag=openssl-3.1.3
 	openssl_name=openssl-$openssl_tag
 	openssl_src_dir=$dep_dir/$openssl_name
 	openssl_build_dir=$build_dir/_deps/openssl
