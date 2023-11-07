@@ -1,10 +1,12 @@
 - [YoAuth](#yoauth)
   - [Overview](#overview)
+  - [Vedio showcase](#vedio-showcase)
   - [Download/Compile](#downloadcompile)
     - [Download](#download)
     - [Compile From Source Code](#compile-from-source-code)
       - [Install OpenSSL](#install-openssl)
       - [Compile](#compile)
+  - [Usage](#usage)
     - [First Use](#first-use)
     - [Add Account And Key](#add-account-and-key)
     - [Delete Account](#delete-account)
@@ -20,6 +22,10 @@
 
 * [readme EN](./readme.md)
 * [readme 中文](./readme_cn.md)
+
+## Vedio showcase
+* [BiliBili](https://www.bilibili.com/video/BV1G14y1k7Gr)
+* [Youtube](https://www.youtube.com/watch?v=273TW5fSyVg)
 
 ## Download/Compile
 
@@ -46,11 +52,13 @@ sudo apt install openssl libssl-dev
 sudo pacman -S openssl
 ```
 
-* compile openssl
+* compile openssl  
 If don’t wanna use system package management, can also choose to compile `openssl` directly from the source code, modify `build.sh` in the project root directory, find `build_openssl=0` and change it to `build_openssl=1`, after modify, `openssl` will be automatically downloaded and compiled in build time
 
 #### Compile
 Make sure both CMake and git are installed, run `build.sh` in the root directory of the project, after running, `dist/yoauth.tar.gz` will be generated in the root directory
+
+## Usage
 
 ### First Use
 For the first use, run the `yoauth` command directly, you will be prompted to enter the password twice, and an encrypted file storing the TOTP key will be generated locally. When no other options are entered, the default folder name will be used. Because all content of **YoAuth** is stored locally, please be sure to remember the password you entered, once lost, it will not be retrieved  

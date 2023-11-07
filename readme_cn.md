@@ -1,5 +1,6 @@
 - [YoAuth](#yoauth)
   - [概述](#概述)
+  - [视频演示](#视频演示)
   - [下载/编译](#下载编译)
     - [下载](#下载)
     - [从源码编译](#从源码编译)
@@ -20,6 +21,10 @@
 
 * [readme EN](./readme.md)
 * [readme 中文](./readme_cn.md)
+
+## 视频演示
+* [BiliBili](https://www.bilibili.com/video/BV1G14y1k7Gr)
+* [Youtube](https://www.youtube.com/watch?v=273TW5fSyVg)
 
 ## 下载/编译
 
@@ -46,7 +51,7 @@ sudo apt install openssl libssl-dev
 sudo pacman -S openssl
 ```
 
-* 编译 openssl
+* 编译 openssl  
 如果不想使用系统包管理，也可以选择直接从源码编译 `openssl`，修改项目根目录中的 `build.sh`, 在其中找到 `build_openssl=0` 并将其改为 `build_openssl=1`，这样在进行编译的时候会自动下载并编译 `openssl`;  
 
 **注意**: 当开启了编译 `openssl` 的选项，那么编译步骤将耗费较多的时间，好处是可以打出一个 `portable` 安装包，确保了在相同系统中可以直接拷贝使用
