@@ -118,7 +118,7 @@ if [ $build_openssl -eq 1 ]; then
 	cd $dep_dir
 
 	openssl_git=https://github.com/openssl/openssl.git
-	openssl_tag=openssl-3.1.3
+	openssl_tag=openssl-3.1.4
 	openssl_name=openssl-$openssl_tag
 	openssl_src_dir=$dep_dir/$openssl_name
 	openssl_build_dir=$build_dir/_deps/openssl
