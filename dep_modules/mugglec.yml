@@ -23,7 +23,7 @@ jobs:
             -DBUILD_SHARED_LIBS=ON \
             -DCMAKE_INSTALL_PREFIX=${HPB_OUTPUT_DIR};
           cmake --build ${HPB_BUILD_DIR} --config ${build_type};
-          cmake --build ${HPB_BUILD_DIR} --target install;
+          cmake --build ${HPB_BUILD_DIR} --config ${build_type} --target install;
   package:
     needs: [build]
     steps:
