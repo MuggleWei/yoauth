@@ -1,7 +1,7 @@
 name: mugglec
 variables:
   - build_type: release
-  - mugglec_tag: v1.3.5
+  - mugglec_tag: v1.4.3
   - mugglec_url: https://github.com/MuggleWei/mugglec.git
 source:
   maintainer: mugglewei

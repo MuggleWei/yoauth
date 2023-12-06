@@ -71,7 +71,7 @@ if [ $build_mugglec -eq 1 ]; then
 	cd $dep_dir
 
 	mugglec_git=https://github.com/MuggleWei/mugglec.git
-	mugglec_tag=v1.3.2
+	mugglec_tag=v1.4.3
 	mugglec_name=mugglec-$mugglec_tag
 	mugglec_src_dir=$dep_dir/$mugglec_name
 	mugglec_build_dir=$build_dir/_deps/mugglec
@@ -85,11 +85,6 @@ if [ $build_mugglec -eq 1 ]; then
 		mkdir -p $mugglec_build_dir
 	fi
 	cd $mugglec_build_dir
-
-	# patch for mac
-	if [[ "$OSTYPE" == "darwin"* ]]; then
-		cp $origin_dir/patch_scripts/mugglec_cmakelist.txt $mugglec_src_dir/CMakeLists.txt
-	fi
 
 	cmake \
 		-S $mugglec_src_dir -B $mugglec_build_dir \
