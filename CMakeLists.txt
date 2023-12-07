@@ -10,13 +10,15 @@ message("-- use c++ compiler ${CMAKE_CXX_COMPILER}")
 
 # set compile parameter
 if (${CMAKE_C_COMPILER_ID} STREQUAL GNU)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native -Wall -Wextra")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 elseif (${CMAKE_C_COMPILER_ID} MATCHES Clang)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-missing-field-initializers")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-missing-field-initializers")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 elseif (${CMAKE_C_COMPILER_ID} STREQUAL MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1 -D_UNICODE -DUNICODE)
+	add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+	add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 endif()
 
 # set standard and print features
@@ -64,6 +66,19 @@ message("# find dependencies begin")
 foreach(path ${CMAKE_PREFIX_PATH})
 	message("# CMake Prefix Path: ${path}")
 endforeach()
+
+# patch: find_package failed when use android toolchain
+if (ANDROID)
+	message("# ANDROID PLATFORM: ${ANDROID_PLATFORM}")
+	message("# CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
+	message("# append CMAKE_PREFIX_PATH into CMAKE_FIND_ROOT_PATH")
+	foreach(path ${CMAKE_PREFIX_PATH})
+		list(APPEND CMAKE_FIND_ROOT_PATH "${path}")
+	endforeach()
+
+	# Or use NO_CMAKE_FIND_ROOT_PATH, but openssl still failed
+	#find_package(mugglec REQUIRED NO_CMAKE_FIND_ROOT_PATH)
+endif()
 
 find_package(mugglec REQUIRED)
 if (mugglec_FOUND)

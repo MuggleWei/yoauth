@@ -20,8 +20,11 @@ build_openssl=1
 # directories
 build_dir=$origin_dir/build
 deps_dir=$origin_dir/_deps
-dist_dir=$build_dir/usr
+dist_dir=$build_dir/dist
 pkg_dir=$origin_dir/dist
+
+abi=arm64-v8a
+min_sdk=29
 
 # function
 download_src() {
@@ -43,7 +46,15 @@ download_src() {
 	fi
 }
 
-# create directories
+# check ndk
+if [ -z "$ANDROID_NDK_ROOT" ]; then
+	echo "run without ANDROID_NDK_ROOT"
+	exit 1
+else
+	echo "ndk: $ANDROID_NDK_ROOT"
+fi
+
+# clean
 if [ ! -d $build_dir ]; then
 	echo "create build directory"
 	mkdir -p $build_dir
@@ -89,18 +100,13 @@ if [ $build_mugglec -eq 1 ]; then
 	cmake \
 		-S $mugglec_src_dir -B $mugglec_build_dir \
 		-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-		-DBUILD_SHARED_LIBS=ON \
-		-DMUGGLE_BUILD_STATIC_PIC=ON \
-		-DMUGGLE_BUILD_TRACE=OFF \
-		-DMUGGLE_BUILD_SANITIZER=OFF \
-		-DBUILD_TESTING=OFF \
-		-DMUGGLE_BUILD_EXAMPLE=OFF \
-		-DMUGGLE_BUILD_BENCHMARK=OFF \
-		-DCMAKE_INSTALL_PREFIX=$dist_dir
-
+		-DBUILD_SHARED_LIBS=OFF \
+		-DCMAKE_INSTALL_PREFIX=$dist_dir \
+		-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+		-DANDROID_ABI=$abi \
+		-DANDROID_PLATFORM=android-$min_sdk
 	cmake --build $mugglec_build_dir
 	cmake --build $mugglec_build_dir --target install
-	#ln -sf $mugglec_build_dir/compile_commands.json $mugglec_src_dir/
 else
 	echo "option build mugglec off, ignore build mugglec"
 fi
@@ -128,11 +134,16 @@ if [ $build_openssl -eq 1 ]; then
 	fi
 	cd $openssl_build_dir
 
+	PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 	$openssl_src_dir/Configure \
+		android-arm64 \
+		-U__ANDROID_API__ \
+		-D__ANDROID_API__=$min_sdk \
 		--prefix=$dist_dir \
 		--openssldir=$dist_dir \
 		--libdir=lib \
 		threads \
+		no-shared \
 		no-comp \
 		-Wl,-rpath,\\\$\$ORIGIN/../lib \
 		no-tests \
@@ -152,21 +163,16 @@ cd $origin_dir
 cmake \
 	-S $origin_dir -B $build_dir \
 	-DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+	-DBUILD_SHARED_LIBS=OFF \
 	-DCMAKE_PREFIX_PATH=$dist_dir \
-	-DCMAKE_INSTALL_PREFIX=$dist_dir
-#ln -sf $build_dir/compile_commands.json $origin_dir/
+	-DCMAKE_INSTALL_PREFIX=$dist_dir \
+	-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
+	-DANDROID_ABI=$abi \
+	-DANDROID_PLATFORM=android-$min_sdk
 cmake --build $build_dir
 cmake --build $build_dir --target install
 
 # package
 cd $dist_dir
-if [[ "$OSTYPE" == "darwin"* ]]; then
-	# force change rpath to openssl in yoauth
-	if [ $build_openssl -eq 1 ]; then
-		install_name_tool -change "$dist_dir/lib/libcrypto.3.dylib" @rpath/libcrypto.3.dylib bin/yoauth
-	fi
-	tar -czvf yoauth.tar.gz bin/yoauth* lib/*.dylib*
-else
-	tar -czvf yoauth.tar.gz bin/yoauth* lib/*.so*
-fi
+tar -czvf yoauth.tar.gz bin/yoauth*
 mv yoauth.tar.gz $pkg_dir
