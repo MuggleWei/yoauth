@@ -159,14 +159,28 @@ cmake --build $build_dir
 cmake --build $build_dir --target install
 
 # package
+cd $origin_dir
+
+ver=$(head -1 version.txt)
+uname_s="$(uname -s)"
+case "${uname_s}" in
+	Linux*) sys_name=linux;;
+	Darwin*) sys_name=mac;;
+	*) sys_name=unknown
+esac
+glibc_ver=$(ldd --version | awk '/ldd/ {print $NF}')
+arch=$(uname -m)
+
+pkg_name=yoauth-v$ver-$sys_name-glibc$glibc_ver-$arch
+
 cd $dist_dir
 if [[ "$OSTYPE" == "darwin"* ]]; then
 	# force change rpath to openssl in yoauth
 	if [ $build_openssl -eq 1 ]; then
 		install_name_tool -change "$dist_dir/lib/libcrypto.3.dylib" @rpath/libcrypto.3.dylib bin/yoauth
 	fi
-	tar -czvf yoauth.tar.gz bin/yoauth* lib/*.dylib*
+	tar -czvf ${pkg_name}.tar.gz bin/yoauth* lib/*.dylib*
 else
-	tar -czvf yoauth.tar.gz bin/yoauth* lib/*.so*
+	tar -czvf ${pkg_name}.tar.gz bin/yoauth* lib/*.so*
 fi
-mv yoauth.tar.gz $pkg_dir
+mv ${pkg_name}.tar.gz $pkg_dir
