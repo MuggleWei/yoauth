@@ -27,9 +27,9 @@
 #### 安装 openssl (可选)
 此步骤是可选的, 默认情况下, **YoAuth** 会下载并编译 `openssl`, 这样的好处是可以打出一个 `portable` 安装包，确保了在相同系统中可以直接拷贝使用; 劣势是编译步骤将耗费较多的时间  
 
-用户也可以选择使用系统包管理安装
+用户也可以选择使用系统包管理安装  
 
-* 关闭 openssl 编译
+* 关闭 openssl 编译  
 修改项目根目录中的 `build.sh`, 在其中找到 `build_openssl=1` 并将其改为 `build_openssl=0`
 
 * ubuntu

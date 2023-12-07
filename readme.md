@@ -27,9 +27,9 @@ Gurantee Cmake and git already installed
 #### Install OpenSSL (Optional)
 This step is optional. By Default, **YOAuth** will download and compile `openssl`, the advantage of this is that it can generate a `portable` package, it can be directly copied and used on the same system; the disadvantage is that the compilation step will take more time.  
 
-User also can choose to use system package management to install `openssl`
+User also can choose to use system package management to install `openssl`  
 
-* close openssl build
+* close openssl build  
 Modify `build.sh` in the project root directory, find `build_openssl=1` and change it to `build_openssl=0`
 
 * ubuntu
