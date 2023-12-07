@@ -67,6 +67,19 @@ foreach(path ${CMAKE_PREFIX_PATH})
 	message("# CMake Prefix Path: ${path}")
 endforeach()
 
+# patch: find_package failed when use android toolchain
+if (ANDROID)
+	message("# ANDROID PLATFORM: ${ANDROID_PLATFORM}")
+	message("# CMAKE_FIND_ROOT_PATH: ${CMAKE_FIND_ROOT_PATH}")
+	message("# append CMAKE_PREFIX_PATH into CMAKE_FIND_ROOT_PATH")
+	foreach(path ${CMAKE_PREFIX_PATH})
+		list(APPEND CMAKE_FIND_ROOT_PATH "${path}")
+	endforeach()
+
+	# Or use NO_CMAKE_FIND_ROOT_PATH, but openssl still failed
+	#find_package(mugglec REQUIRED NO_CMAKE_FIND_ROOT_PATH)
+endif()
+
 find_package(mugglec REQUIRED)
 if (mugglec_FOUND)
 	message("deps mugglec version: ${mugglec_VERSION}")

@@ -24,6 +24,7 @@ dist_dir=$build_dir/dist
 pkg_dir=$origin_dir/dist
 
 abi=arm64-v8a
+min_sdk=29
 
 # function
 download_src() {
@@ -44,6 +45,14 @@ download_src() {
 		git clone --branch $tag --depth 1 $git_repo $src_dir
 	fi
 }
+
+# check ndk
+if [ -z "$ANDROID_NDK_ROOT" ]; then
+	echo "run without ANDROID_NDK_ROOT"
+	exit 1
+else
+	echo "ndk: $ANDROID_NDK_ROOT"
+fi
 
 # clean
 if [ ! -d $build_dir ]; then
@@ -94,7 +103,8 @@ if [ $build_mugglec -eq 1 ]; then
 		-DBUILD_SHARED_LIBS=OFF \
 		-DCMAKE_INSTALL_PREFIX=$dist_dir \
 		-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
-		-DANDROID_ABI=$abi
+		-DANDROID_ABI=$abi \
+		-DANDROID_PLATFORM=android-$min_sdk
 	cmake --build $mugglec_build_dir
 	cmake --build $mugglec_build_dir --target install
 else
@@ -127,6 +137,8 @@ if [ $build_openssl -eq 1 ]; then
 	PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 	$openssl_src_dir/Configure \
 		android-arm64 \
+		-U__ANDROID_API__ \
+		-D__ANDROID_API__=$min_sdk \
 		--prefix=$dist_dir \
 		--openssldir=$dist_dir \
 		--libdir=lib \
@@ -155,12 +167,12 @@ cmake \
 	-DCMAKE_PREFIX_PATH=$dist_dir \
 	-DCMAKE_INSTALL_PREFIX=$dist_dir \
 	-DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
-	-DANDROID_ABI=$abi
-	#-DCMAKE_FIND_ROOT_PATH=$dist_dir \
+	-DANDROID_ABI=$abi \
+	-DANDROID_PLATFORM=android-$min_sdk
 cmake --build $build_dir
 cmake --build $build_dir --target install
 
 # package
 cd $dist_dir
-tar -czvf yoauth.tar.gz bin
+tar -czvf yoauth.tar.gz bin/yoauth*
 mv yoauth.tar.gz $pkg_dir
