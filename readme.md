@@ -1,21 +1,3 @@
-- [YoAuth](#yoauth)
-  - [Overview](#overview)
-  - [Vedio showcase](#vedio-showcase)
-  - [Download/Compile](#downloadcompile)
-    - [Download](#download)
-    - [Compile From Source Code](#compile-from-source-code)
-      - [Install OpenSSL](#install-openssl)
-      - [Compile](#compile)
-  - [Usage](#usage)
-    - [First Use](#first-use)
-    - [Add Account And Key](#add-account-and-key)
-    - [Delete Account](#delete-account)
-    - [View Verification Code](#view-verification-code)
-  - [Backup/Migration](#backupmigration)
-    - [Backup Data Files](#backup-data-files)
-    - [Dump](#dump)
-
-
 # YoAuth
 ## Overview
 **YoAuth** is a local, pure terminal command line TOTP generator, used for 2FA verification of accounts such as github, google or microsoft  
@@ -39,8 +21,16 @@ Users can also compile from the source code without download package. There are 
 
 For the sake of simplicity, users who are not familiar with C package management can also easily to compile, here only introduces the way of directly using build script in project  
 
-#### Install OpenSSL
-User can choose to use system package management to install, or compile `openssl` source code
+#### Dependency tools
+Gurantee Cmake and git already installed
+
+#### Install OpenSSL (Optional && Not recommended)
+This step is optional. By Default, **YoAuth** will download and compile `openssl`, the advantage of this is that it can generate a `portable` package, it can be directly copied and used on the same system; the disadvantage is that the compilation step will take more time.  
+
+User also can choose to use system package management to install `openssl`  
+
+* close openssl build  
+Modify `build.sh` in the project root directory, find `build_openssl=1` and change it to `build_openssl=0`
 
 * ubuntu
 ```
@@ -52,11 +42,8 @@ sudo apt install openssl libssl-dev
 sudo pacman -S openssl
 ```
 
-* compile openssl  
-If don’t wanna use system package management, can also choose to compile `openssl` directly from the source code, modify `build.sh` in the project root directory, find `build_openssl=0` and change it to `build_openssl=1`, after modify, `openssl` will be automatically downloaded and compiled in build time
-
 #### Compile
-Make sure both CMake and git are installed, run `build.sh` in the root directory of the project, after running, `dist/yoauth.tar.gz` will be generated in the root directory
+Run `build.sh` in the root directory of the project, after running, `dist/yoauth*.tar.gz` will be generated in the root directory
 
 ## Usage
 

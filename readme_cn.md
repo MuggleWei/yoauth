@@ -1,20 +1,3 @@
-- [YoAuth](#yoauth)
-  - [概述](#概述)
-  - [视频演示](#视频演示)
-  - [下载/编译](#下载编译)
-    - [下载](#下载)
-    - [从源码编译](#从源码编译)
-      - [安装 openssl](#安装-openssl)
-      - [编译](#编译)
-  - [使用](#使用)
-    - [第一次使用](#第一次使用)
-    - [添加账户和密钥](#添加账户和密钥)
-    - [删除账户](#删除账户)
-    - [查看验证码](#查看验证码)
-  - [备份/迁移](#备份迁移)
-    - [备份 data 文件](#备份-data-文件)
-    - [Dump](#dump)
-
 # YoAuth
 ## 概述
 **YoAuth** 是一个本地的，纯命令行终端下的 TOTP generator，可用于诸如 github, google 或者 microsoft 账户的 2FA 验证
@@ -38,8 +21,16 @@
 
 简单起见，为了不熟悉 C 包管理的用户也可以轻松编译，这里仅介绍直接使用使用项目中脚本进行编译的方式
 
-#### 安装 openssl
-可以选择使用系统包管理安装，也可以选择编译 `openssl` 源码
+#### 依赖工具
+确保 CMake 和 git 都已经安装
+
+#### 安装 openssl (可选 && 不推荐)
+此步骤是可选的, 默认情况下, **YoAuth** 会下载并编译 `openssl`, 这样的好处是可以打出一个 `portable` 安装包，确保了在相同系统中可以直接拷贝使用; 劣势是编译步骤将耗费较多的时间  
+
+用户也可以选择使用系统包管理安装  
+
+* 关闭 openssl 编译  
+修改项目根目录中的 `build.sh`, 在其中找到 `build_openssl=1` 并将其改为 `build_openssl=0`
 
 * ubuntu
 ```
@@ -51,13 +42,8 @@ sudo apt install openssl libssl-dev
 sudo pacman -S openssl
 ```
 
-* 编译 openssl  
-如果不想使用系统包管理，也可以选择直接从源码编译 `openssl`，修改项目根目录中的 `build.sh`, 在其中找到 `build_openssl=0` 并将其改为 `build_openssl=1`，这样在进行编译的时候会自动下载并编译 `openssl`;  
-
-**注意**: 当开启了编译 `openssl` 的选项，那么编译步骤将耗费较多的时间，好处是可以打出一个 `portable` 安装包，确保了在相同系统中可以直接拷贝使用
-
 #### 编译
-确保 CMake 和 git 都已经安装，运行项目根目录中的 `build.sh`，运行结束后，将在根目录中生成 `dist/yoauth.tar.gz`  
+运行项目根目录中的 `build.sh`，运行结束后，将在根目录中生成 `dist/yoauth*.tar.gz`
 
 ## 使用
 将下载/编译好的包解压到任何你想要的位置，比如: `./local/app/yoauth`，运行其 `bin` 目录中 `yoauth -h`，将看到使用帮助  
