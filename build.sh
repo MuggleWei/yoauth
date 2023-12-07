@@ -71,7 +71,7 @@ if [ $build_mugglec -eq 1 ]; then
 	cd $deps_dir
 
 	mugglec_git=https://github.com/MuggleWei/mugglec.git
-	mugglec_tag=v1.4.3
+	mugglec_tag=v1.4.4
 	mugglec_name=mugglec-$mugglec_tag
 	mugglec_src_dir=$deps_dir/$mugglec_name
 	mugglec_build_dir=$build_dir/_deps/mugglec

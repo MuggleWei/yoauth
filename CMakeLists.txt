@@ -325,6 +325,8 @@ else()
 	endforeach(subdir ${CMAKE_PREFIX_PATH})
 endif()
 
+include(InstallRequiredSystemLibraries)
+
 ################################
 # tests
 ################################
