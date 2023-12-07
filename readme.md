@@ -25,7 +25,7 @@ For the sake of simplicity, users who are not familiar with C package management
 Gurantee Cmake and git already installed
 
 #### Install OpenSSL (Optional && Not recommended)
-This step is optional. By Default, **YOAuth** will download and compile `openssl`, the advantage of this is that it can generate a `portable` package, it can be directly copied and used on the same system; the disadvantage is that the compilation step will take more time.  
+This step is optional. By Default, **YoAuth** will download and compile `openssl`, the advantage of this is that it can generate a `portable` package, it can be directly copied and used on the same system; the disadvantage is that the compilation step will take more time.  
 
 User also can choose to use system package management to install `openssl`  
 
